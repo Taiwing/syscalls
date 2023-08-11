@@ -2,14 +2,7 @@
 
 # This script will find all the syscall definitions in the kernel source code.
 # TODO: make this architecture independent (do this for every architecture)
-# TODO: only look for headers and see if the results are the same in case of
-# multiple matches and in proper priority order
 # TODO: then look for the SYSCALL_DEFINE if the prototype is not found
-
-# header priority:
-# arch/<arch>/include/*
-# include/asm-generic/*
-# include/linux/*
 
 #################### CONFIGURATION ####################
 
@@ -55,36 +48,46 @@ function find_by_define {
 }
 
 # find the syscall by function prototype in the header files
-# TODO: actually maybe only keep the first matching file since the headers are
-# both in priority order and in ascii order (this means that the first match
-# should be the correct one, even if there are multiple matches)
 function find_by_prototype {
 	SYS_ENTRY=$1
+	FILES=()
 	RESULT=0
-	#MATCHING_FILES=()
+	# this is in priority order
 	VALID_HEADERS=(\
 		"arch/$ARCH_NAME/include/"
 		"include/asm-generic/"
 		"include/linux/"
 	)
 
-	# find by prototype declaration
-	OUTPUT=($(\
-		rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\(" \
-		${VALID_HEADERS[@]}
-	))
+	for HEADER_PATH in ${VALID_HEADERS[@]}; do
+		# find by prototype declaration
+		OUTPUT=($(\
+			rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\(" \
+			$HEADER_PATH
+		))
 
-	#TODO: use this later to get the full prototype
-	#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
+		#TODO: use this later to get the full prototype
+		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
 
-	# gather the results
-	for MATCH in "${OUTPUT[@]}"; do
-		ARR_MATCH=(${MATCH//:/ })
-		#FILE=${ARR_MATCH[0]}
-		COUNT=${ARR_MATCH[1]}
-		RESULT=$((RESULT+COUNT))
-		#MATCHING_FILES+=($FILE)
+		for MATCH in ${OUTPUT[@]}; do
+			ARR_MATCH=(${MATCH//:/ })
+			FILE+=(${ARR_MATCH[0]})
+			COUNT=${ARR_MATCH[1]}
+			RESULT=$((RESULT+COUNT))
+		done
+
+		# stop if we found a match
+		[ $RESULT -gt 0 ] && break
 	done
+
+	# print the results if there are multiple file matches (TEMP)
+	if [ ${#FILES[@]} -gt 1 ]; then
+		echo "Multiple file matches for $SYS_ENTRY:"
+		for FILE in ${FILES[@]}; do
+			echo $FILE
+		done
+		echo
+	fi
 
 	return $RESULT
 }
