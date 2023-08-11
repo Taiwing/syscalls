@@ -49,6 +49,43 @@ done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
+#TODO
+function find_by_define {
+	OUTPUT=($(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" | cut -d':' -f2))
+}
+
+# find the syscall by function prototype in the header files
+# TODO: actually maybe only keep the first matching file since the headers are
+# both in priority order and in ascii order (this means that the first match
+# should be the correct one, even if there are multiple matches)
+function find_by_prototype {
+	SYS_ENTRY=$1
+	RESULT=0
+	#MATCHING_FILES=()
+	VALID_HEADERS=(\
+		"arch/$ARCH_NAME/include/"
+		"include/asm-generic/"
+		"include/linux/"
+	)
+
+	# find by prototype declaration
+	OUTPUT=($(\
+		rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\(" \
+		${VALID_HEADERS[@]}
+	))
+
+	# gather the results
+	for MATCH in "${OUTPUT[@]}"; do
+		ARR_MATCH=(${MATCH//:/ })
+		#FILE=${ARR_MATCH[0]}
+		COUNT=${ARR_MATCH[1]}
+		RESULT=$((RESULT+COUNT))
+		#MATCHING_FILES+=($FILE)
+	done
+
+	return $RESULT
+}
+
 # find all the syscall prototypes
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
@@ -64,18 +101,8 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# find the syscall declarations
 	RESULT=0
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		# find by prototype declaration
-		OUTPUT=($(rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\("))
-
-		# find by SYSCALL_DEFINE
-		#OUTPUT=$(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" | cut -d':' -f2)
-
-		# sum the results
-		for MATCH in "${OUTPUT[@]}"; do
-			ARR_MATCH=(${MATCH//:/ })
-			COUNT=${ARR_MATCH[1]}
-			RESULT=$((RESULT+COUNT))
-		done
+		find_by_prototype $SYS_ENTRY
+		RESULT=$?
 	fi
 
 	# count errors and found syscalls
