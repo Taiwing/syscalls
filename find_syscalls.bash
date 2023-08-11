@@ -43,55 +43,8 @@ done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
-
-# build a list of all the syscall source directories
-RAW_SOURCES=$(\
-	find . -maxdepth 1 -type d -not -name 'arch' -not -name '.*' \
-	| tr -d './' \
-	| sort
-)
-VALID_SOURCES=("arch/$ARCH_NAME") # in priority order
-for DIRECTORY in $RAW_SOURCES; do
-	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
-		VALID_SOURCES+=($DIRECTORY)
-	fi
-done
-
-# find the syscall by syscall define in the source files
-function find_by_define {
-	SYS_ENTRY=$1
-	FILES=()
-	RESULT=0
-
-	for SOURCE_PATH in ${VALID_SOURCES[@]}; do
-		# find by syscall define
-		OUTPUT=($(\
-			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
-			$SOURCE_PATH
-		))
-
-		#TODO: use this later to get the full prototype
-		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
-
-		for MATCH in ${OUTPUT[@]}; do
-			ARR_MATCH=(${MATCH//:/ })
-			FILES+=(${ARR_MATCH[0]})
-			COUNT=${ARR_MATCH[1]}
-			RESULT=$((RESULT+COUNT))
-		done
-
-		# stop if we found a match
-		[ $RESULT -gt 0 ] && break
-	done
-
-	# print the results
-	echo "${FILES[@]}"
-
-	return $RESULT
-}
-
 # find the syscall by function prototype in the header files
-function find_by_prototype {
+function find_matching_file_by_prototype {
 	SYS_ENTRY=$1
 	FILES=()
 	RESULT=0
@@ -129,11 +82,77 @@ function find_by_prototype {
 	return $RESULT
 }
 
+
+# build a list of all the syscall source directories
+RAW_SOURCES=$(\
+	find . -maxdepth 1 -type d -not -name 'arch' -not -name '.*' \
+	| tr -d './' \
+	| sort
+)
+VALID_SOURCES=("arch/$ARCH_NAME") # in priority order
+for DIRECTORY in $RAW_SOURCES; do
+	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
+		VALID_SOURCES+=($DIRECTORY)
+	fi
+done
+
+# find the syscall by syscall define in the source files
+function find_matching_file_by_define {
+	SYS_ENTRY=$1
+	FILES=()
+	RESULT=0
+
+	for SOURCE_PATH in ${VALID_SOURCES[@]}; do
+		# find by syscall define
+		OUTPUT=($(\
+			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
+			$SOURCE_PATH
+		))
+
+		#TODO: use this later to get the full prototype
+		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
+
+		for MATCH in ${OUTPUT[@]}; do
+			ARR_MATCH=(${MATCH//:/ })
+			FILES+=(${ARR_MATCH[0]})
+			COUNT=${ARR_MATCH[1]}
+			RESULT=$((RESULT+COUNT))
+		done
+
+		# stop if we found a match
+		[ $RESULT -gt 0 ] && break
+	done
+
+	# print the results
+	echo "${FILES[@]}"
+
+	return $RESULT
+}
+
+# get the full syscall prototype
+function get_details_by_prototype {
+	SYS_ENTRY=$1
+	FILE=$2
+
+	# get the full prototype
+	rg -U "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);" $FILE
+}
+
+# get the full syscall define
+function get_details_by_define {
+	SYS_NAME=$1
+	FILE=$2
+
+	# get the full define
+	rg -U "\bSYSCALL_DEFINE.\($SYS_NAME\b(?s).*?\)" $FILE
+}
+
 # find all the syscall prototypes
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
 MULTIPLE_COUNT=0
+#DETAILS_ARR=()	#TEMP
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	SCOLS=(${SYSCALL})
@@ -141,17 +160,17 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	SYS_NAME=${SCOLS[1]}
 	SYS_ENTRY=${SCOLS[2]}
 
-	# find the syscall declarations
+	# find the syscall file
 	RESULT=0
 	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		FILES=$(find_by_prototype $SYS_ENTRY)
+		FILES=$(find_matching_file_by_prototype $SYS_ENTRY)
 		RESULT=$?
 		METHOD="prototype"
 
 		# if we didn't a unique syscall, try to find one by syscall define
 		if [ $RESULT -ne 1 ]; then
-			FILES2=$(find_by_define $SYS_NAME)
+			FILES2=$(find_matching_file_by_define $SYS_NAME)
 			RESULT2=$?
 
 			# if we found a unique syscall or if there was no syscall
@@ -168,6 +187,24 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			for FILE in ${FILES[@]}; do
 				echo "  $FILE"
 			done
+			exit 1
+		fi
+	fi
+
+	# get details about the syscall
+	DETAILS=""
+	if [ $RESULT -eq 1 -a ${#FILES[@]} -eq 1 ]; then
+		if [ $METHOD = "prototype" ]; then
+			DETAILS=$(get_details_by_prototype $SYS_ENTRY ${FILES[0]})
+		else
+			DETAILS=$(get_details_by_define $SYS_NAME ${FILES[0]})
+			#DETAILS_ARR+=("$DETAILS")	#TEMP
+		fi
+
+		# check if we actually got the details
+		if [ $? -ne 0 -o -z "$DETAILS" ]; then
+			echo -n "ERROR: $SYS_NUMBER $SYS_NAME: "
+			echo "unexpected get_details_by_$METHOD failure"
 			exit 1
 		fi
 	fi
@@ -198,3 +235,9 @@ echo "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
 echo "Multiple definitions: $MULTIPLE_COUNT/${#SYS_CALLS[@]}"
+
+#TEMP
+#echo
+#for DETAILS in "${DETAILS_ARR[@]}"; do
+#	echo "$DETAILS"
+#done
