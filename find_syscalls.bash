@@ -30,11 +30,11 @@ while read LINE; do
     SYS_CALLS+=("${LCOLS[0]} ${LCOLS[2]} ${LCOLS[3]:-sys_ni_syscall}")
 done < $ARCH_FILE
 
+# find all the syscall definition macros
 UNIQUE_COUNT=0
 MULTIPLE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
-# find all the syscall definitions
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	read -a SCOLS <<< $SYSCALL
