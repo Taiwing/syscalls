@@ -74,6 +74,9 @@ function find_by_prototype {
 		${VALID_HEADERS[@]}
 	))
 
+	#TODO: use this later to get the full prototype
+	#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
+
 	# gather the results
 	for MATCH in "${OUTPUT[@]}"; do
 		ARR_MATCH=(${MATCH//:/ })
