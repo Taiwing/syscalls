@@ -31,20 +31,20 @@ VALID_ABIS=("common" "$ABI_NAME")
 # read the table file line by line
 SYS_CALLS=()
 while read LINE; do
-    # skip comments
-    [[ $LINE =~ ^#.*$ ]] && continue
+	# skip comments
+	[[ $LINE =~ ^#.*$ ]] && continue
 
-    # skip empty lines
-    [[ -z $LINE ]] && continue
+	# skip empty lines
+	[[ -z $LINE ]] && continue
 
-    # split the line into columns
-    read -a LCOLS <<< $LINE
+	# split the line into columns
+	LCOLS=(${LINE})
 
 	# if the ABI is not valid, skip it
-    [[ ! "${VALID_ABIS[@]}" =~ "${LCOLS[1]}" ]] && continue
+	[[ ! "${VALID_ABIS[@]}" =~ "${LCOLS[1]}" ]] && continue
 
-    # add the syscall to the list
-    SYS_CALLS+=("${LCOLS[0]} ${LCOLS[2]} ${LCOLS[3]:-sys_ni_syscall}")
+	# add the syscall to the list
+	SYS_CALLS+=("${LCOLS[0]} ${LCOLS[2]} ${LCOLS[3]:-sys_ni_syscall}")
 done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
@@ -56,33 +56,39 @@ NOT_FOUND_COUNT=0
 MULTIPLE_COUNT=0
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
-	read -a SCOLS <<< $SYSCALL
+	SCOLS=(${SYSCALL})
+	SYS_NUMBER=${SCOLS[0]}
+	SYS_NAME=${SCOLS[1]}
+	SYS_ENTRY=${SCOLS[2]}
 
 	# find the syscall declarations
 	RESULT=0
-	if [ ${SCOLS[2]} != "sys_ni_syscall" ]; then
+	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
 		# find by prototype declaration
-		OUTPUT=$(rg --glob '*.h' --count-matches "\basmlinkage\b.*\b${SCOLS[2]}\b\(" | cut -d':' -f2)
+		OUTPUT=($(rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\("))
+
 		# find by SYSCALL_DEFINE
-		#OUTPUT=$(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\(${SCOLS[1]}\b" | cut -d':' -f2)
+		#OUTPUT=$(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" | cut -d':' -f2)
 
 		# sum the results
-		for COUNT in $OUTPUT; do
+		for MATCH in "${OUTPUT[@]}"; do
+			ARR_MATCH=(${MATCH//:/ })
+			COUNT=${ARR_MATCH[1]}
 			RESULT=$((RESULT+COUNT))
 		done
 	fi
 
 	# count errors and found syscalls
-	if [ ${SCOLS[2]} = "sys_ni_syscall" ]; then
+	if [ $SYS_ENTRY = "sys_ni_syscall" ]; then
 		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
 	elif [ $RESULT -eq 0 ]; then
 		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
-		echo "${SCOLS[0]} ${SCOLS[1]} not found (${SCOLS[2]})"
+		echo "$SYS_NUMBER $SYS_NAME not found ($SYS_ENTRY)"
 	elif [ $RESULT -eq 1 ]; then
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
 	elif [ $RESULT -gt 1 ]; then
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
-		echo "${SCOLS[0]} ${SCOLS[1]} multiple matches ($RESULT)"
+		echo "$SYS_NUMBER $SYS_NAME multiple matches ($RESULT)"
 	else
 		echo "ERROR: unexpected result ($RESULT)"
 		exit 1
