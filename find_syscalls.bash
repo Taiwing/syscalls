@@ -2,7 +2,8 @@
 
 # This script will find all the syscall definitions in the kernel source code.
 # TODO: make this architecture independent (do this for every architecture)
-# TODO: then look for the SYSCALL_DEFINE if the prototype is not found
+# TODO: get and parse the syscall prototypes (for the number of parameters)
+# TODO: if we really cant find a defined syscall just set it to 0 parameter
 
 #################### CONFIGURATION ####################
 
@@ -42,9 +43,51 @@ done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
-#TODO
+
+# build a list of all the syscall source directories
+RAW_SOURCES=$(\
+	find . -maxdepth 1 -type d -not -name 'arch' -not -name '.*' \
+	| tr -d './' \
+	| sort
+)
+VALID_SOURCES=("arch/$ARCH_NAME") # in priority order
+for DIRECTORY in $RAW_SOURCES; do
+	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
+		VALID_SOURCES+=($DIRECTORY)
+	fi
+done
+
+# find the syscall by syscall define in the source files
 function find_by_define {
-	OUTPUT=($(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" | cut -d':' -f2))
+	SYS_ENTRY=$1
+	FILES=()
+	RESULT=0
+
+	for SOURCE_PATH in ${VALID_SOURCES[@]}; do
+		# find by syscall define
+		OUTPUT=($(\
+			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
+			$SOURCE_PATH
+		))
+
+		#TODO: use this later to get the full prototype
+		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
+
+		for MATCH in ${OUTPUT[@]}; do
+			ARR_MATCH=(${MATCH//:/ })
+			FILES+=(${ARR_MATCH[0]})
+			COUNT=${ARR_MATCH[1]}
+			RESULT=$((RESULT+COUNT))
+		done
+
+		# stop if we found a match
+		[ $RESULT -gt 0 ] && break
+	done
+
+	# print the results
+	echo "${FILES[@]}"
+
+	return $RESULT
 }
 
 # find the syscall by function prototype in the header files
@@ -100,9 +143,24 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 
 	# find the syscall declarations
 	RESULT=0
+	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
 		FILES=$(find_by_prototype $SYS_ENTRY)
 		RESULT=$?
+		METHOD="prototype"
+
+		# if we didn't a unique syscall, try to find one by syscall define
+		if [ $RESULT -ne 1 ]; then
+			FILES2=$(find_by_define $SYS_NAME)
+			RESULT2=$?
+
+			# if we found a unique syscall or if there was no syscall
+			if [ $RESULT2 -eq 1 ] || [ $RESULT -eq 0 -a $RESULT2 -ne 0 ]; then
+				FILES=$FILES2
+				RESULT=$RESULT2
+				METHOD="define"
+			fi
+		fi
 
 		# check if we found multiple files (this should never happen)
 		if [ ${#FILES[@]} -gt 1 ]; then
@@ -124,7 +182,7 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
 	elif [ $RESULT -gt 1 ]; then
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
-		echo "$SYS_NUMBER $SYS_NAME multiple matches ($RESULT)"
+		echo "$SYS_NUMBER $SYS_NAME multiple matches ($RESULT by '$METHOD')"
 	else
 		# this should never happen
 		echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected result ($RESULT)"
