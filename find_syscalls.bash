@@ -32,40 +32,44 @@ done < $ARCH_FILE
 
 # find all the syscall definition macros
 UNIQUE_COUNT=0
-MULTIPLE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
+MULTIPLE_COUNT=0
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	read -a SCOLS <<< $SYSCALL
 
 	# find the syscall definitions
-	OUTPUT=$(rg --count-matches "\bSYSCALL_DEFINE.\(${SCOLS[1]}\b" | cut -d':' -f2)
-
-	# sum the results
 	RESULT=0
-	for COUNT in $OUTPUT; do
-		RESULT=$((RESULT+COUNT))
-	done
+	if [ ${SCOLS[2]} != "sys_ni_syscall" ]; then
+		OUTPUT=$(rg --count-matches "\bSYSCALL_DEFINE.\(${SCOLS[1]}\b" | cut -d':' -f2)
+
+		# sum the results
+		for COUNT in $OUTPUT; do
+			RESULT=$((RESULT+COUNT))
+		done
+	fi
 
 	# count errors and found syscalls
-	if [ $RESULT -eq 1 ]; then
+	if [ ${SCOLS[2]} = "sys_ni_syscall" ]; then
+		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
+	elif [ $RESULT -eq 0 ]; then
+		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
+		echo "${SCOLS[0]} ${SCOLS[1]} not found (${SCOLS[2]})"
+	elif [ $RESULT -eq 1 ]; then
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
 	elif [ $RESULT -gt 1 ]; then
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
 		echo "${SCOLS[0]} ${SCOLS[1]} multiple matches ($RESULT)"
-	elif [ $RESULT -eq 0 ]; then
-		if [ ${SCOLS[2]} = "sys_ni_syscall" ]; then
-			NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
-		else
-			NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
-			echo "${SCOLS[0]} ${SCOLS[1]} not found (${SCOLS[2]})"
-		fi
+	else
+		echo "ERROR: unexpected result ($RESULT)"
+		exit 1
 	fi
 done
 
 # print the results
+echo
 echo "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
-echo "Multiple definitions: $MULTIPLE_COUNT/${#SYS_CALLS[@]}"
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
+echo "Multiple definitions: $MULTIPLE_COUNT/${#SYS_CALLS[@]}"
