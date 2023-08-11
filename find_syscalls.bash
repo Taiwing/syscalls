@@ -2,17 +2,34 @@
 
 # This script will find all the syscall definitions in the kernel source code.
 # TODO: make this architecture independent (do this for every architecture)
+# TODO: only look for headers and see if the results are the same in case of
+# multiple matches and in proper priority order
+# TODO: then look for the SYSCALL_DEFINE if the prototype is not found
+
+# header priority:
+# arch/<arch>/include/*
+# include/asm-generic/*
+# include/linux/*
+
+#################### CONFIGURATION ####################
 
 # path to the linux kernel source code
 LINUX_PATH="./linux"
 cd $LINUX_PATH
 
-# list of all the x86 64bit syscalls
+# path to the syscall table file
 ARCH_FILE="arch/x86/entry/syscalls/syscall_64.tbl"
-VALID_ABIS=("common" "64")
-SYS_CALLS=()
+# architecture name (for the header path)
+ARCH_NAME="x86"
+# ABI name (for the syscall table)
+ABI_NAME="64"
+# valid ABIs for this architecture
+VALID_ABIS=("common" "$ABI_NAME")
 
-# read the file line by line
+#################### PARSE SYSCALL TABLE ####################
+
+# read the table file line by line
+SYS_CALLS=()
 while read LINE; do
     # skip comments
     [[ $LINE =~ ^#.*$ ]] && continue
@@ -30,7 +47,9 @@ while read LINE; do
     SYS_CALLS+=("${LCOLS[0]} ${LCOLS[2]} ${LCOLS[3]:-sys_ni_syscall}")
 done < $ARCH_FILE
 
-# find all the syscall definition macros
+#################### FIND SYSCALL DECLARATIONS ####################
+
+# find all the syscall prototypes
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
@@ -39,10 +58,13 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	read -a SCOLS <<< $SYSCALL
 
-	# find the syscall definitions
+	# find the syscall declarations
 	RESULT=0
 	if [ ${SCOLS[2]} != "sys_ni_syscall" ]; then
-		OUTPUT=$(rg --count-matches "\bSYSCALL_DEFINE.\(${SCOLS[1]}\b" | cut -d':' -f2)
+		# find by prototype declaration
+		OUTPUT=$(rg --glob '*.h' --count-matches "\basmlinkage\b.*\b${SCOLS[2]}\b\(" | cut -d':' -f2)
+		# find by SYSCALL_DEFINE
+		#OUTPUT=$(rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\(${SCOLS[1]}\b" | cut -d':' -f2)
 
 		# sum the results
 		for COUNT in $OUTPUT; do
@@ -66,6 +88,8 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		exit 1
 	fi
 done
+
+#################### PRINT RESULTS ####################
 
 # print the results
 echo
