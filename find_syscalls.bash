@@ -1,6 +1,7 @@
 #!/bin/env bash
 
-# This script will find all the syscall definitions in the kernel source code.
+# This script will find all the syscall definitions in the kernel source code
+# for a given architecture and ABI.
 # TODO: make this architecture independent (do this for every architecture)
 # TODO: parse the syscall prototypes (for the number of parameters)
 # TODO: if we really cant find a defined syscall just set it to 0 parameter
@@ -12,11 +13,11 @@ LINUX_PATH="./linux"
 cd $LINUX_PATH
 
 # path to the syscall table file
-ARCH_FILE="arch/x86/entry/syscalls/syscall_64.tbl"
+ARCH_FILE="${1:-arch/x86/entry/syscalls/syscall_64.tbl}"
 # architecture name (for the header path)
-ARCH_NAME="x86"
+ARCH_NAME="${2:-x86}"
 # ABI name (for the syscall table)
-ABI_NAME="64"
+ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
 VALID_ABIS=("common" "$ABI_NAME")
 
