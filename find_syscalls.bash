@@ -5,9 +5,10 @@
 
 # path to the linux kernel source code
 LINUX_PATH="./linux"
+cd $LINUX_PATH
 
 # list of all the x86 64bit syscalls
-ARCH_FILE="${LINUX_PATH}/arch/x86/entry/syscalls/syscall_64.tbl"
+ARCH_FILE="arch/x86/entry/syscalls/syscall_64.tbl"
 VALID_ABIS=("common" "64")
 SYS_CALLS=()
 
