@@ -71,7 +71,7 @@ function find_by_prototype {
 
 		for MATCH in ${OUTPUT[@]}; do
 			ARR_MATCH=(${MATCH//:/ })
-			FILE+=(${ARR_MATCH[0]})
+			FILES+=(${ARR_MATCH[0]})
 			COUNT=${ARR_MATCH[1]}
 			RESULT=$((RESULT+COUNT))
 		done
@@ -80,14 +80,8 @@ function find_by_prototype {
 		[ $RESULT -gt 0 ] && break
 	done
 
-	# print the results if there are multiple file matches (TEMP)
-	if [ ${#FILES[@]} -gt 1 ]; then
-		echo "Multiple file matches for $SYS_ENTRY:"
-		for FILE in ${FILES[@]}; do
-			echo $FILE
-		done
-		echo
-	fi
+	# print the results
+	echo "${FILES[@]}"
 
 	return $RESULT
 }
@@ -107,8 +101,17 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# find the syscall declarations
 	RESULT=0
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		find_by_prototype $SYS_ENTRY
+		FILES=$(find_by_prototype $SYS_ENTRY)
 		RESULT=$?
+
+		# check if we found multiple files (this should never happen)
+		if [ ${#FILES[@]} -gt 1 ]; then
+			echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
+			for FILE in ${FILES[@]}; do
+				echo "  $FILE"
+			done
+			exit 1
+		fi
 	fi
 
 	# count errors and found syscalls
@@ -123,7 +126,8 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
 		echo "$SYS_NUMBER $SYS_NAME multiple matches ($RESULT)"
 	else
-		echo "ERROR: unexpected result ($RESULT)"
+		# this should never happen
+		echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected result ($RESULT)"
 		exit 1
 	fi
 done
