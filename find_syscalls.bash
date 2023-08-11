@@ -2,7 +2,7 @@
 
 # This script will find all the syscall definitions in the kernel source code.
 # TODO: make this architecture independent (do this for every architecture)
-# TODO: get and parse the syscall prototypes (for the number of parameters)
+# TODO: parse the syscall prototypes (for the number of parameters)
 # TODO: if we really cant find a defined syscall just set it to 0 parameter
 
 #################### CONFIGURATION ####################
@@ -62,9 +62,6 @@ function find_matching_file_by_prototype {
 			$HEADER_PATH
 		))
 
-		#TODO: use this later to get the full prototype
-		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
-
 		for MATCH in ${OUTPUT[@]}; do
 			ARR_MATCH=(${MATCH//:/ })
 			FILES+=(${ARR_MATCH[0]})
@@ -108,9 +105,6 @@ function find_matching_file_by_define {
 			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
 			$SOURCE_PATH
 		))
-
-		#TODO: use this later to get the full prototype
-		#rg -U --glob '*.h' "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);"
 
 		for MATCH in ${OUTPUT[@]}; do
 			ARR_MATCH=(${MATCH//:/ })
