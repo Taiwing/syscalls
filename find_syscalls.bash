@@ -19,7 +19,7 @@ ARCH_NAME="${2:-x86}"
 # ABI name (for the syscall table)
 ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
-VALID_ABIS=("common" "$ABI_NAME")
+TARGET_ABIS=("common" "$ABI_NAME")
 
 #################### PARSE SYSCALL TABLE ####################
 
@@ -34,12 +34,23 @@ while read LINE; do
 
 	# split the line into columns
 	LCOLS=(${LINE})
+	SYS_NUMBER=${LCOLS[0]}
+	SYS_ABI=${LCOLS[1]}
+	SYS_NAME=${LCOLS[2]}
 
-	# if the ABI is not valid, skip it
-	[[ ! "${VALID_ABIS[@]}" =~ "${LCOLS[1]}" ]] && continue
+	# if the syscall is not for this ABI, skip it
+	[[ ! "${TARGET_ABIS[@]}" =~ "$SYS_ABI" ]] && continue
+
+	# define SYS_ENTRY with fallback to SYS_COMPAT if needed
+	SYS_ENTRY=""
+	if [ -n "${LCOLS[3]}" -a "${LCOLS[3]}" != "-" ]; then
+		SYS_ENTRY="${LCOLS[3]}"
+	elif [ -n "${LCOLS[4]}" -a "${LCOLS[4]}" != "-" ]; then
+		SYS_ENTRY="${LCOLS[4]}"
+	fi
 
 	# add the syscall to the list
-	SYS_CALLS+=("${LCOLS[0]} ${LCOLS[2]} ${LCOLS[3]:-sys_ni_syscall}")
+	SYS_CALLS+=("$SYS_NUMBER $SYS_NAME ${SYS_ENTRY:-sys_ni_syscall}")
 done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
