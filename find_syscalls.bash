@@ -143,6 +143,27 @@ function reduce_files_by_define {
 		COUNTS=(${COUNTS[@]})
 	fi
 
+	# if there is 32 and 64 bits versions, remove one
+	if [ ${#FILES[@]} -gt 1 -a $ADDR_SIZE -ne 0 ] \
+		&& [[ "${FILES[@]}" =~ ^(.*+ |)(.*)_32\.c(| .*)$ ]]; then
+		# we got the 32 bits version, keep the file name
+		FILE_BASE="${BASH_REMATCH[2]}"
+
+		# see if we have the 64 bits version and remove one
+		if [[ "${FILES[@]}" =~ ^(.*+ |)(.*)_64\.c(| .*)$ ]] \
+			&& [ "${BASH_REMATCH[2]}" = "$FILE_BASE" ]; then
+			for INDEX in ${!FILES[@]}; do
+				if [ "${FILES[$INDEX]}" = "${FILE_BASE}_${ADDR_SIZE}.c" ]; then
+					unset FILES[$INDEX]
+					unset COUNTS[$INDEX]
+					break
+				fi
+			done
+			FILES=(${FILES[@]})
+			COUNTS=(${COUNTS[@]})
+		fi
+	fi
+
 	# recompute RESULT since we may have removed some files
 	for COUNT in ${COUNTS[@]}; do
 		RESULT=$((RESULT+COUNT))
