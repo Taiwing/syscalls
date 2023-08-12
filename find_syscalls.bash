@@ -19,7 +19,7 @@ ARCH_NAME="${2:-x86}"
 # ABI name (for the syscall table)
 ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
-TARGET_ABIS=("common" "$ABI_NAME")
+TARGET_ABIS=("common" $ABI_NAME)
 
 #################### PARSE SYSCALL TABLE ####################
 
