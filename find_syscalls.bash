@@ -220,15 +220,15 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
 	elif [ $RESULT -eq 0 ]; then
 		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
-		echo "$SYS_NUMBER $SYS_NAME not found ($SYS_ENTRY)"
+		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"
 	elif [ $RESULT -eq 1 ]; then
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
 	elif [ $RESULT -gt 1 ]; then
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
-		echo "$SYS_NUMBER $SYS_NAME multiple matches ($RESULT by '$METHOD')"
+		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() multiple matches ($RESULT by '$METHOD')"
 	else
 		# this should never happen
-		echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected result ($RESULT)"
+		echo "ERROR: $SYS_NUMBER $SYS_NAME $SYS_ENTRY(): unexpected result ($RESULT)"
 		exit 1
 	fi
 done
