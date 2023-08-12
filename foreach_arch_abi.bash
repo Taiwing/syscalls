@@ -41,6 +41,7 @@ for TABLE_FILE in ${TABLE_FILES}; do
 	for ABI_NAME in "${ABI_NAMES[@]}"; do
 		echo
 		echo ------------------------------------------------------------
+		echo
 		echo ARCH_FILE="$ARCH_FILE"
 		echo ARCH_NAME="$ARCH_NAME"
 		echo ABI_NAME="$ABI_NAME"
