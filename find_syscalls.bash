@@ -57,9 +57,9 @@ done < $ARCH_FILE
 
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
-	SYS_ENTRY=$1
-	FILES=()
-	RESULT=0
+	local SYS_ENTRY=$1
+	local FILES=()
+	local RESULT=0
 	# this is in priority order
 	VALID_HEADERS=(\
 		"arch/$ARCH_NAME/"
@@ -105,11 +105,40 @@ for DIRECTORY in $RAW_SOURCES; do
 	fi
 done
 
+function reduce_files_by_define {
+	local RESULT=0
+	local FILES=($(echo $1 | tr ':' ' '))
+	local COUNTS=($(echo $2 | tr ':' ' '))
+
+	# if conflict between kernel/ and um/ subdirectories, prefer kernel
+	if [[ "${FILES[@]}" =~ "/kernel/" ]] && [[ "${FILES[@]}" =~ "/um/" ]]; then
+		for INDEX in ${!FILES[@]}; do
+			if [[ "${FILES[$INDEX]}" =~ "/um/" ]]; then
+				unset FILES[$INDEX]
+				unset COUNTS[$INDEX]
+			fi
+		done
+		FILES=(${FILES[@]})
+		COUNTS=(${COUNTS[@]})
+	fi
+
+	# recompute RESULT since we may have removed some files
+	for COUNT in ${COUNTS[@]}; do
+		RESULT=$((RESULT+COUNT))
+	done
+
+	# print the results
+	echo "${FILES[@]}"
+
+	return $RESULT
+}
+
 # find the syscall by syscall define in the source files
 function find_matching_file_by_define {
-	SYS_ENTRY=$1
-	FILES=()
-	RESULT=0
+	local SYS_ENTRY=$1
+	local FILES=()
+	local COUNTS=()
+	local RESULT=0
 
 	for SOURCE_PATH in ${VALID_SOURCES[@]}; do
 		# find by syscall define
@@ -122,8 +151,17 @@ function find_matching_file_by_define {
 			ARR_MATCH=(${MATCH//:/ })
 			FILES+=(${ARR_MATCH[0]})
 			COUNT=${ARR_MATCH[1]}
+			COUNTS+=($COUNT)
 			RESULT=$((RESULT+COUNT))
 		done
+
+		# try and zero in on a unique file if needed
+		if [ ${#FILES[@]} -gt 1 ]; then
+			FILES_ARG="$(echo ${FILES[@]} | tr ' ' ':')"
+			COUNTS_ARG="$(echo ${COUNTS[@]} | tr ' ' ':')"
+			FILES=($(reduce_files_by_define "$FILES_ARG" "$COUNTS_ARG"))
+			RESULT=$?
+		fi
 
 		# stop if we found a match
 		[ $RESULT -gt 0 ] && break
@@ -137,8 +175,8 @@ function find_matching_file_by_define {
 
 # get the full syscall prototype
 function get_details_by_prototype {
-	SYS_ENTRY=$1
-	FILE=$2
+	local SYS_ENTRY=$1
+	local FILE=$2
 
 	# get the full prototype
 	rg -U "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);" $FILE
@@ -146,8 +184,8 @@ function get_details_by_prototype {
 
 # get the full syscall define
 function get_details_by_define {
-	SYS_NAME=$1
-	FILE=$2
+	local SYS_NAME=$1
+	local FILE=$2
 
 	# get the full define
 	rg -U "\bSYSCALL_DEFINE.\($SYS_NAME\b(?s).*?\)" $FILE
@@ -170,31 +208,32 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	RESULT=0
 	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		FILES=$(find_matching_file_by_prototype $SYS_ENTRY)
+		FILES=($(find_matching_file_by_prototype $SYS_ENTRY))
 		RESULT=$?
 		METHOD="prototype"
 
-		# if we didn't a unique syscall, try to find one by syscall define
+		# if we didn't get a unique syscall, try to find one by syscall define
 		if [ $RESULT -ne 1 ]; then
-			FILES2=$(find_matching_file_by_define $SYS_NAME)
+			FILES2="$(find_matching_file_by_define $SYS_NAME)"
 			RESULT2=$?
 
 			# if we found a unique syscall or if there was no syscall
 			if [ $RESULT2 -eq 1 ] || [ $RESULT -eq 0 -a $RESULT2 -ne 0 ]; then
-				FILES=$FILES2
+				FILES=($FILES2)
 				RESULT=$RESULT2
 				METHOD="define"
 			fi
 		fi
 
+		#TEMP: TODO: uncomment
 		# check if we found multiple files (this should never happen)
-		if [ ${#FILES[@]} -gt 1 ]; then
-			echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
-			for FILE in ${FILES[@]}; do
-				echo "  $FILE"
-			done
-			exit 1
-		fi
+		#if [ ${#FILES[@]} -gt 1 ]; then
+		#	echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
+		#	for FILE in ${FILES[@]}; do
+		#		echo "  $FILE"
+		#	done
+		#	exit 1
+		#fi
 	fi
 
 	# get details about the syscall
@@ -226,6 +265,9 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	elif [ $RESULT -gt 1 ]; then
 		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() multiple matches ($RESULT by '$METHOD')"
+		for FILE in ${FILES[@]}; do
+			echo "  $FILE"
+		done
 	else
 		# this should never happen
 		echo "ERROR: $SYS_NUMBER $SYS_NAME $SYS_ENTRY(): unexpected result ($RESULT)"
