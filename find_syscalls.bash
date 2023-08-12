@@ -62,7 +62,7 @@ function find_matching_file_by_prototype {
 	RESULT=0
 	# this is in priority order
 	VALID_HEADERS=(\
-		"arch/$ARCH_NAME/include/"
+		"arch/$ARCH_NAME/"
 		"include/asm-generic/"
 		"include/linux/"
 	)
