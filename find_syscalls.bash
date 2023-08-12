@@ -105,17 +105,31 @@ for DIRECTORY in $RAW_SOURCES; do
 	fi
 done
 
+# reduce the list of files if possible
 function reduce_files_by_define {
 	local RESULT=0
 	local FILES=($(echo $1 | tr ':' ' '))
 	local COUNTS=($(echo $2 | tr ':' ' '))
 
-	# if conflict between kernel/ and um/ subdirectories, prefer kernel
+	# if conflict between kernel/ and um/ subdirectories, prefer kernel/
 	if [[ "${FILES[@]}" =~ "/kernel/" ]] && [[ "${FILES[@]}" =~ "/um/" ]]; then
 		for INDEX in ${!FILES[@]}; do
 			if [[ "${FILES[$INDEX]}" =~ "/um/" ]]; then
 				unset FILES[$INDEX]
 				unset COUNTS[$INDEX]
+			fi
+		done
+		FILES=(${FILES[@]})
+		COUNTS=(${COUNTS[@]})
+	fi
+
+	# if nommu.c is there remove it
+	if [ ${#FILES[@]} -gt 1 ] && [[ "${FILES[@]}" =~ "/nommu.c" ]]; then
+		for INDEX in ${!FILES[@]}; do
+			if [[ "${FILES[$INDEX]}" =~ "/nommu.c" ]]; then
+				unset FILES[$INDEX]
+				unset COUNTS[$INDEX]
+				break
 			fi
 		done
 		FILES=(${FILES[@]})
