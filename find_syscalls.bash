@@ -115,54 +115,48 @@ done
 # reduce the list of files if possible
 function reduce_files_by_define {
 	local RESULT=0
+	local TO_REMOVE=()
 	local FILES=($(echo $1 | tr ':' ' '))
 	local COUNTS=($(echo $2 | tr ':' ' '))
 
 	# if conflict between kernel/ and um/ subdirectories, prefer kernel/
 	if [[ "${FILES[@]}" =~ "/kernel/" ]] && [[ "${FILES[@]}" =~ "/um/" ]]; then
 		for INDEX in ${!FILES[@]}; do
-			if [[ "${FILES[$INDEX]}" =~ "/um/" ]]; then
-				unset FILES[$INDEX]
-				unset COUNTS[$INDEX]
-			fi
+			[[ "${FILES[$INDEX]}" =~ "/um/" ]] && TO_REMOVE+=($INDEX)
 		done
-		FILES=(${FILES[@]})
-		COUNTS=(${COUNTS[@]})
 	fi
 
-	# if nommu.c is there remove it
-	if [ ${#FILES[@]} -gt 1 ] && [[ "${FILES[@]}" =~ "/nommu.c" ]]; then
-		for INDEX in ${!FILES[@]}; do
-			if [[ "${FILES[$INDEX]}" =~ "/nommu.c" ]]; then
-				unset FILES[$INDEX]
-				unset COUNTS[$INDEX]
-				break
-			fi
+	# remove blacklisted files
+	local BLACKLIST=("nommu.c" "posix-stubs.c")
+	for INDEX in ${!FILES[@]}; do
+		for BLACKLISTED in ${BLACKLIST[@]}; do
+			[[ "${FILES[$INDEX]}" =~ /$BLACKLISTED ]] && TO_REMOVE+=($INDEX)
 		done
-		FILES=(${FILES[@]})
-		COUNTS=(${COUNTS[@]})
-	fi
+	done
 
-	# if there is 32 and 64 bits versions, remove one
-	if [ ${#FILES[@]} -gt 1 -a $ADDR_SIZE -ne 0 ] \
-		&& [[ "${FILES[@]}" =~ ^(.*+ |)(.*)_32\.c(| .*)$ ]]; then
-		# we got the 32 bits version, keep the file name
-		FILE_BASE="${BASH_REMATCH[2]}"
-
-		# see if we have the 64 bits version and remove one
-		if [[ "${FILES[@]}" =~ ^(.*+ |)(.*)_64\.c(| .*)$ ]] \
-			&& [ "${BASH_REMATCH[2]}" = "$FILE_BASE" ]; then
+	# remove file with wrong ADDR_SIZE if the right one is present
+	if [ $ADDR_SIZE -eq 32 -o $ADDR_SIZE -eq 64 ]; then
+		OTHER_SIZE=$((ADDR_SIZE==32?64:32))
+		for FILE in ${FILES[@]}; do
+			[[ $FILE =~ ^(.*)_${ADDR_SIZE}\.c$ ]] || continue
+			OTHER_FILE="${BASH_REMATCH[1]}_${OTHER_SIZE}.c"
 			for INDEX in ${!FILES[@]}; do
-				if [ "${FILES[$INDEX]}" = "${FILE_BASE}_${ADDR_SIZE}.c" ]; then
-					unset FILES[$INDEX]
-					unset COUNTS[$INDEX]
+				if [ "${FILES[$INDEX]}" = "$OTHER_FILE" ]; then
+					TO_REMOVE+=($INDEX)
 					break
 				fi
 			done
-			FILES=(${FILES[@]})
-			COUNTS=(${COUNTS[@]})
-		fi
+		done
 	fi
+
+	# remove files
+	TO_REMOVE=($(echo ${TO_REMOVE[@]} | tr ' ' '\n' | sort -rn | uniq))
+	for INDEX in ${TO_REMOVE[@]}; do
+		unset FILES[$INDEX]
+		unset COUNTS[$INDEX]
+	done
+	FILES=(${FILES[@]})
+	COUNTS=(${COUNTS[@]})
 
 	# recompute RESULT since we may have removed some files
 	for COUNT in ${COUNTS[@]}; do
