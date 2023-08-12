@@ -3,6 +3,12 @@
 # This script iterates over all syscall tables in the linux kernel source code
 # and calls find_syscalls.bash for each architecture and ABI pair possible.
 
+# arguments:
+# 1. target architecture
+# 2. target ABI
+ARCH_NAME_ARG="$1"
+ABI_NAME_ARG="$2"
+
 # path to the linux kernel source code
 LINUX_PATH="./linux"
 
@@ -17,6 +23,11 @@ for TABLE_FILE in ${TABLE_FILES}; do
 	# extract the architecture and the table name
 	[[ $TABLE_FILE =~ arch/([^/]*)/.*syscall_*(.*)\.tbl ]]
 	ARCH_NAME="${BASH_REMATCH[1]}"
+
+	# if the architecture is specified, skip all others
+	if [ ! -z "$ARCH_NAME_ARG" ] && [ "$ARCH_NAME_ARG" != "$ARCH_NAME" ]; then
+		continue
+	fi
 
 	# list every ABI in the table
 	ABI_NAMES=($(grep -v '^#' < $TABLE_FILE | grep -v '^$' | awk '{print $2}' | sort | uniq))
@@ -39,6 +50,12 @@ for TABLE_FILE in ${TABLE_FILES}; do
 
 	# print the parameters and find syscalls
 	for ABI_NAME in "${ABI_NAMES[@]}"; do
+		# if the ABI is specified, skip all others
+		if [ ! -z "$ABI_NAME_ARG" ] && [ "$ABI_NAME_ARG" != "$ABI_NAME" ]; then
+			continue
+		fi
+
+		# print script parameters
 		echo
 		echo ------------------------------------------------------------
 		echo
@@ -46,6 +63,8 @@ for TABLE_FILE in ${TABLE_FILES}; do
 		echo ARCH_NAME="$ARCH_NAME"
 		echo ABI_NAME="$ABI_NAME"
 		echo
+
+		# get the syscalls
 		./find_syscalls.bash "$ARCH_FILE" "$ARCH_NAME" "$ABI_NAME"
 	done
 done
