@@ -2,7 +2,6 @@
 
 # This script will find all the syscall definitions in the kernel source code
 # for a given architecture and ABI.
-# TODO: make this architecture independent (do this for every architecture)
 # TODO: parse the syscall prototypes (for the number of parameters)
 # TODO: if we really cant find a defined syscall just set it to 0 parameter
 
@@ -20,6 +19,14 @@ ARCH_NAME="${2:-x86}"
 ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
 TARGET_ABIS=("common" $ABI_NAME)
+
+# get address size (32 or 64)
+ADDR_SIZE=0
+if [[ "${ARCH_FILE}" =~ _(32|64)\.tbl ]]; then
+	ADDR_SIZE=${BASH_REMATCH[1]}
+elif [[ "${ABI_NAME}" =~ ^(|.* )(32|64)$ ]]; then
+	ADDR_SIZE=${BASH_REMATCH[2]}
+fi
 
 #################### PARSE SYSCALL TABLE ####################
 
