@@ -261,15 +261,14 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			fi
 		fi
 
-		#TEMP: TODO: uncomment
 		# check if we found multiple files (this should never happen)
-		#if [ ${#FILES[@]} -gt 1 ]; then
-		#	echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
-		#	for FILE in ${FILES[@]}; do
-		#		echo "  $FILE"
-		#	done
-		#	exit 1
-		#fi
+		if [ ${#FILES[@]} -gt 1 ]; then
+			echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
+			for FILE in ${FILES[@]}; do
+				echo "  $FILE"
+			done
+			exit 1
+		fi
 	fi
 
 	# get details about the syscall
