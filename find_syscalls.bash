@@ -62,6 +62,56 @@ done < $ARCH_FILE
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
+# get Kconfig options
+declare -A SPECIFIC_CONFIG_NAMES
+SPECIFIC_CONFIG_NAMES["x86_i386"]="X86_32 COMPAT_32"
+SPECIFIC_CONFIG_NAMES["x86_64"]="X86_64"
+SPECIFIC_CONFIG_NAMES["powerpc_nospu 32"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_nospu 64"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_spu"]="PPC"
+SPECIFIC_CONFIG_NAMES["sh"]="SUPERH"
+function get_kconfig {
+	local OPTIONS=()
+	local ARCH_ABI=""
+	local KCONFIG_KEYS=()
+	local KCONFIG_FILE="arch/$ARCH_NAME/Kconfig"
+	echo "KCONFIG_FILE: $KCONFIG_FILE"
+
+	# return if Kconfig file does not exist (this means default)
+	[ ! -f $KCONFIG_FILE ] && return
+
+	echo YES
+
+	# set unique ARCH_ABI identifier
+	if [ "${ABI_NAME}" != "common" ]; then
+		ARCH_ABI="${ARCH_NAME}_${ABI_NAME}"
+	else
+		ARCH_ABI="${ARCH_NAME}"
+	fi
+
+	# set KCONFIG_KEYS depending on ARCH_ABI to handle special cases
+	if [ -n "${SPECIFIC_CONFIG_NAMES[$ARCH_ABI]}" ]; then
+		KCONFIG_KEYS=(${SPECIFIC_CONFIG_NAMES[$ARCH_ABI]})
+	else
+		KCONFIG_KEYS=($(echo $ARCH_NAME | tr '[:lower:]' '[:upper:]'))
+	fi
+
+	# get the Kconfig block from the file
+	for KEY in ${KCONFIG_KEYS[@]}; do
+	#OUTPUT=$(\
+		rg --pcre2 -U \
+		'(?s)(\A|\R)\Kconfig\s+'"$KEY"'\n.*?(?=\Rendmenu\b|\Rconfig\b|\Z)' \
+		$KCONFIG_FILE | grep -E '^\s+select\s+\b\w+\b$'
+	#)
+	done
+
+	#echo $OUTPUT
+}
+
+#TEMP
+#get_kconfig
+#exit 0
+
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
 	local SYS_ENTRY=$1
