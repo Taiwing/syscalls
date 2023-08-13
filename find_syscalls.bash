@@ -5,7 +5,7 @@
 # TODO: parse the syscall prototypes (for the number of parameters)
 # TODO: if we really cant find a defined syscall just set it to 0 parameter
 
-#################### CONFIGURATION ####################
+#################### SCRIPT CONFIGURATION ####################
 
 # path to the linux kernel source code
 LINUX_PATH="./linux"
@@ -60,9 +60,9 @@ while read LINE; do
 	SYS_CALLS+=("$SYS_NUMBER $SYS_NAME ${SYS_ENTRY:-sys_ni_syscall}")
 done < $ARCH_FILE
 
-#################### FIND SYSCALL DECLARATIONS ####################
+#################### GET SPECIFIC KCONFIG ####################
 
-# get Kconfig options
+# special cases where the Kconfig section name is not the same as the arch name
 declare -A SPECIFIC_CONFIG_NAMES
 SPECIFIC_CONFIG_NAMES["x86_i386"]="X86_32 COMPAT_32"
 SPECIFIC_CONFIG_NAMES["x86_64"]="X86_64"
@@ -70,6 +70,8 @@ SPECIFIC_CONFIG_NAMES["powerpc_nospu 32"]="PPC"
 SPECIFIC_CONFIG_NAMES["powerpc_nospu 64"]="PPC"
 SPECIFIC_CONFIG_NAMES["powerpc_spu"]="PPC"
 SPECIFIC_CONFIG_NAMES["sh"]="SUPERH"
+
+# get Kconfig options
 function get_kconfig {
 	local OPTIONS=()
 	local ARCH_ABI=""
@@ -105,14 +107,20 @@ function get_kconfig {
 	done
 
 	# print the results
-	for OPTION in ${OPTIONS[@]}; do
-		echo $OPTION
-	done
+	echo "${OPTIONS[@]}"
 }
 
+# set Kconfig options
+KCONFIG_OPTIONS=($(get_kconfig))
+
 #TEMP
-#get_kconfig
+#echo "KCONFIG_OPTIONS:"
+#for OPTION in ${KCONFIG_OPTIONS[@]}; do
+#	echo "  $OPTION"
+#done
 #exit 0
+
+#################### FIND SYSCALL DECLARATIONS ####################
 
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
