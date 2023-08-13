@@ -75,12 +75,9 @@ function get_kconfig {
 	local ARCH_ABI=""
 	local KCONFIG_KEYS=()
 	local KCONFIG_FILE="arch/$ARCH_NAME/Kconfig"
-	echo "KCONFIG_FILE: $KCONFIG_FILE"
 
 	# return if Kconfig file does not exist (this means default)
 	[ ! -f $KCONFIG_FILE ] && return
-
-	echo YES
 
 	# set unique ARCH_ABI identifier
 	if [ "${ABI_NAME}" != "common" ]; then
@@ -96,16 +93,21 @@ function get_kconfig {
 		KCONFIG_KEYS=($(echo $ARCH_NAME | tr '[:lower:]' '[:upper:]'))
 	fi
 
-	# get the Kconfig block from the file
+	# get the Kconfig block from the file and extract the options
 	for KEY in ${KCONFIG_KEYS[@]}; do
-	#OUTPUT=$(\
-		rg --pcre2 -U \
-		'(?s)(\A|\R)\Kconfig\s+'"$KEY"'\n.*?(?=\Rendmenu\b|\Rconfig\b|\Z)' \
-		$KCONFIG_FILE | grep -E '^\s+select\s+\b\w+\b$'
-	#)
+		OUTPUT=($(\
+			rg --pcre2 -U \
+			'(?s)(\A|\R)\Kconfig\s+'"$KEY"'\n.*?(?=\Rendmenu\b|\Rconfig\b|\Z)' \
+			$KCONFIG_FILE | grep -E '^\s+select\s+\b\w+\b$' \
+			| sed -E 's/^\s+select\s+(\b\w+\b)$/\1/'
+		))
+		OPTIONS=("${OPTIONS[@]}" "${OUTPUT[@]}")
 	done
 
-	#echo $OUTPUT
+	# print the results
+	for OPTION in ${OPTIONS[@]}; do
+		echo $OPTION
+	done
 }
 
 #TEMP
