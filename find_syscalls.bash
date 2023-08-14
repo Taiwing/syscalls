@@ -1,9 +1,27 @@
 #!/bin/env bash
 
 # This script will find all the syscall definitions in the kernel source code
-# for a given architecture and ABI.
-# TODO: parse the syscall prototypes (for the number of parameters)
-# TODO: if we really cant find a defined syscall just set it to 0 parameter
+# for a given architecture and ABI. It returns a CSV file with the following
+# columns:
+# - nr: syscall number
+# - name: syscall name
+# - status: syscall status (implemented, not implemented or missing)
+# - return_type: syscall return type
+# - param_count: number of parameters
+# - param1: first parameter
+# - param2: second parameter
+# - param3: third parameter
+# - param4: fourth parameter
+# - param5: fifth parameter
+# - param6: sixth parameter
+#
+# The status is determined by the following rules:
+# - implemented: the syscall is implemented in the kernel
+# - not implemented: the syscall is not implemented in the kernel
+# - missing: this script has not found the syscall definition in the kernel, in
+#   most case this means that this script needs to be updated, but it can also
+#   mean that the syscall is implemented in a different way (e.g. using a
+#   different name or a different prototype)
 
 #################### SCRIPT CONFIGURATION ####################
 
@@ -123,9 +141,8 @@ function parse_syscall_prototype {
 
 	# get the return type
 	local RETURN_TYPE=""
-	if [[ "$PROTOTYPE" =~ ^asmlinkage[[:space:]]+([^\(]+)[[:space:]]+$SYS_ENTRY\(.*$ ]]; then
-		RETURN_TYPE="${BASH_REMATCH[1]}"
-	fi
+	[[ "$PROTOTYPE" =~ ^asmlinkage[[:space:]]+([^\(]+)[[:space:]]+$SYS_ENTRY\(.*$ ]] || return 1
+	RETURN_TYPE="${BASH_REMATCH[1]}"
 
 	# print the prototype
 	echo -n "${RETURN_TYPE},${PARAMETER_COUNT}${PARAMETERS}"
@@ -134,7 +151,64 @@ function parse_syscall_prototype {
 	for ((i=PARAMETER_COUNT; i<6; i++)); do
 		echo -n ","
 	done
-	echo
+
+	return 0
+}
+
+# parse syscall define from the source files
+function parse_syscall_define {
+	local SYS_NAME="$1"
+	local PROTOTYPE="$2"
+
+	# get parameter count and parameter string
+	local PARAMETER_COUNT=0
+	[[ "$PROTOTYPE" =~ ^SYSCALL_DEFINE([0-9]+)\((.*)\)$ ]] || return 1
+	PARAMETER_COUNT="${BASH_REMATCH[1]}"
+	PROTOTYPE="${BASH_REMATCH[2]}"
+
+	# if there are no parameters we can print the prototype and return
+	if [ $PARAMETER_COUNT -eq 0 ]; then
+		echo -n "long,0,,,,,,"
+		return 0
+	fi
+
+	# get the parameters
+	[[ "$PROTOTYPE" =~ ^$SYS_NAME,(.*)$ ]] || return 1
+	PROTOTYPE="${BASH_REMATCH[1]}"
+	local COUNT=0
+	local PARAMETERS=""
+	while [[ "$PROTOTYPE" =~ ^([^,]+),([^,]+),?(.*)$ ]]; do
+		# tokenize the parameter type and name
+		read -ra PTYPE -d '' <<< "${BASH_REMATCH[1]}"
+		read -ra PNAME -d '' <<< "${BASH_REMATCH[2]}"
+
+		# remove the __user annotation
+		for INDEX in "${!PTYPE[@]}"; do
+			[ "${PTYPE[$INDEX]}" == "__user" ] && unset PTYPE[$INDEX]
+		done
+
+		# append the parameter to the list
+		if [ -z "$PARAMETERS" ]; then
+			PARAMETERS=",${PTYPE[@]} ${PNAME[@]}"
+		else
+			PARAMETERS="$PARAMETERS,${PTYPE[@]} ${PNAME[@]}"
+		fi
+		PROTOTYPE="${BASH_REMATCH[3]}"
+
+		# increment the parameter count
+		COUNT=$((COUNT+1))
+	done
+	[ $COUNT -ne $PARAMETER_COUNT ] && return 1
+
+	# print the prototype
+	echo -n "long,${PARAMETER_COUNT}${PARAMETERS}"
+
+	#print remaining commas
+	for ((i=PARAMETER_COUNT; i<6; i++)); do
+		echo -n ","
+	done
+
+	return 0
 }
 
 
@@ -527,13 +601,13 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			PARSED_PROTOTYPE=$(parse_syscall_prototype "$SYS_ENTRY" "$DETAILS")
 		else
 			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
-			#PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
-			PARSED_PROTOTYPE="$DETAILS" #TEMP
+			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
 		fi
 
 		# check if we actually got the prototype
 		if [ $? -ne 0 -o -z "$PARSED_PROTOTYPE" ]; then
 			echo "ERROR: $SYS_NUMBER $SYS_NAME: failed to parse prototype"
+			echo $DETAILS
 			exit 1
 		fi
 	fi
