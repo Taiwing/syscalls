@@ -136,6 +136,7 @@ KCONFIG_OPTIONS=($(get_kconfig))
 
 #################### DISAMBIGUATION ####################
 
+# apply Kconfig options and preprocess the file to reduce to one syscall match
 function preprocess_source_file {
 	local SOURCE_FILE=$1
 	local SYSCALL="$(echo $2 | tr '[:lower:]' '[:upper:]')"
@@ -167,19 +168,24 @@ function preprocess_source_file {
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
+# header paths in priority order
+VALID_HEADER_PATHS=(\
+	"arch/$ARCH_NAME/"
+	"include/asm-generic/"
+	"include/linux/"
+)
+
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
 	local SYS_ENTRY=$1
+	local HEADER_PATHS=($2)
 	local FILES=()
 	local RESULT=0
-	# this is in priority order
-	VALID_HEADERS=(\
-		"arch/$ARCH_NAME/"
-		"include/asm-generic/"
-		"include/linux/"
-	)
 
-	for HEADER_PATH in ${VALID_HEADERS[@]}; do
+	# if no header paths specified, use all valid ones
+	[ ${#HEADER_PATHS[@]} -eq 0 ] && HEADER_PATHS=(${VALID_HEADER_PATHS[@]})
+
+	for HEADER_PATH in ${VALID_HEADER_PATHS[@]}; do
 		# find by prototype declaration
 		OUTPUT=($(\
 			rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\(" \
@@ -203,17 +209,16 @@ function find_matching_file_by_prototype {
 	return $RESULT
 }
 
-
 # build a list of all the syscall source directories
-RAW_SOURCES=$(\
+RAW_SOURCE_PATHS=$(\
 	find . -maxdepth 1 -type d -not -name 'arch' -not -name '.*' \
 	| tr -d './' \
 	| sort
 )
-VALID_SOURCES=("arch/$ARCH_NAME") # in priority order
-for DIRECTORY in $RAW_SOURCES; do
+VALID_SOURCE_PATHS=("arch/$ARCH_NAME") # in priority order
+for DIRECTORY in $RAW_SOURCE_PATHS; do
 	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
-		VALID_SOURCES+=($DIRECTORY)
+		VALID_SOURCE_PATHS+=($DIRECTORY)
 	fi
 done
 
@@ -277,11 +282,15 @@ function reduce_files_by_define {
 # find the syscall by syscall define in the source files
 function find_matching_file_by_define {
 	local SYS_ENTRY=$1
+	local SOURCE_PATHS=($2)
 	local FILES=()
 	local COUNTS=()
 	local RESULT=0
 
-	for SOURCE_PATH in ${VALID_SOURCES[@]}; do
+	# if no source paths specified, use all valid ones
+	[ ${#SOURCE_PATHS[@]} -eq 0 ] && SOURCE_PATHS=(${VALID_SOURCE_PATHS[@]})
+
+	for SOURCE_PATH in ${SOURCE_PATHS[@]}; do
 		# find by syscall define
 		OUTPUT=($(\
 			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
