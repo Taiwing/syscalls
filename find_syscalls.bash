@@ -563,14 +563,14 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	RESULT=0
 	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		METHOD="prototype"
-		FILES=($(find_by_prototype $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
+		METHOD="define"
+		FILES=($(find_by_define $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
 		RESULT=$?
 
-		# if we did not get a unique syscall, try to find it by define
+		# if we did not get a unique syscall, try to find it by prototype
 		if [ $RESULT -ne 1 ]; then
-			METHOD="define"
-			FILES=($(find_by_define $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
+			METHOD="prototype"
+			FILES=($(find_by_prototype $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
 			RESULT=$?
 		fi
 
