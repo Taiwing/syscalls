@@ -34,6 +34,11 @@ elif [[ "${ABI_NAME}" =~ ^(|.* )(32|64)$ ]]; then
 	ADDR_SIZE=${BASH_REMATCH[2]}
 fi
 
+# output file
+OUTPUT_FILE="syscalls_${ARCH_ABI}.csv"
+echo -n "nr,name,status,return_type,param_count," > $OUTPUT_FILE
+echo "param1,param2,param3,param4,param5,param6" >> $OUTPUT_FILE
+
 #################### CLEANUP ####################
 
 # remove temporary files
@@ -76,7 +81,64 @@ while read LINE; do
 	SYS_CALLS+=("$SYS_NUMBER $SYS_NAME ${SYS_ENTRY:-sys_ni_syscall}")
 done < $ARCH_FILE
 
-#################### GET SPECIFIC KCONFIG ####################
+#################### PARSE DECLARATIONS ####################
+
+# parse syscall prototype from the header files
+function parse_syscall_prototype {
+	local SYS_ENTRY="$1"
+	local PROTOTYPE="$2"
+
+	# get the parameters
+	local PARAMETER_STRING=""
+	[[ "$PROTOTYPE" =~ \((.*)\)\;$ ]] || return 1
+	PARAMETER_STRING="${BASH_REMATCH[1]}"
+
+	# split and count the parameters
+	local PARAMETERS=""
+	local PARAMETER_COUNT=0
+	while [[ "$PARAMETER_STRING" =~ ^([^,]+),?(.*)$ ]]; do
+		# tokenize the parameter
+		read -ra PARAMETER -d '' <<< "${BASH_REMATCH[1]}"
+
+		# remove the __user annotation
+		for INDEX in "${!PARAMETER[@]}"; do
+			[ "${PARAMETER[$INDEX]}" == "__user" ] && unset PARAMETER[$INDEX]
+		done
+
+		# append the parameter to the list
+		if [ -z "$PARAMETERS" ]; then
+			PARAMETERS=",${PARAMETER[@]}"
+		else
+			PARAMETERS="$PARAMETERS,${PARAMETER[@]}"
+		fi
+		PARAMETER_STRING="${BASH_REMATCH[2]}"
+		PARAMETER_COUNT=$((PARAMETER_COUNT+1))
+	done
+
+	# handle special case for void
+	if [ $PARAMETER_COUNT -eq 1 -a "$PARAMETERS" == ",void" ]; then
+		PARAMETERS=""
+		PARAMETER_COUNT=0
+	fi
+
+	# get the return type
+	local RETURN_TYPE=""
+	if [[ "$PROTOTYPE" =~ ^asmlinkage[[:space:]]+([^\(]+)[[:space:]]+$SYS_ENTRY\(.*$ ]]; then
+		RETURN_TYPE="${BASH_REMATCH[1]}"
+	fi
+
+	# print the prototype
+	echo -n "${RETURN_TYPE},${PARAMETER_COUNT}${PARAMETERS}"
+
+	#print remaining commas
+	for ((i=PARAMETER_COUNT; i<6; i++)); do
+		echo -n ","
+	done
+	echo
+}
+
+
+#################### DISAMBIGUATION ####################
 
 # special cases where the Kconfig section name is not the same as the arch name
 declare -A SPECIFIC_CONFIG_NAMES
@@ -120,8 +182,6 @@ function get_kconfig {
 
 # set Kconfig options
 KCONFIG_OPTIONS=($(get_kconfig))
-
-#################### DISAMBIGUATION ####################
 
 # apply Kconfig options and preprocess the file to reduce to one syscall match
 function preprocess_source_file {
@@ -417,7 +477,6 @@ UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
 MULTIPLE_COUNT=0
-#DETAILS_ARR=()	#TEMP
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	SCOLS=(${SYSCALL})
@@ -460,19 +519,21 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	fi
 
 	# get details about the syscall
-	DETAILS=""
+	PARSED_PROTOTYPE=""
 	if [ $RESULT -eq 1 ]; then
+		DETAILS=""
 		if [ $METHOD = "prototype" ]; then
 			DETAILS=$(get_details_by_prototype $SYS_ENTRY $FILE)
+			PARSED_PROTOTYPE=$(parse_syscall_prototype "$SYS_ENTRY" "$DETAILS")
 		else
 			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
-			#DETAILS_ARR+=("$DETAILS")	#TEMP
+			#PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
+			PARSED_PROTOTYPE="$DETAILS" #TEMP
 		fi
 
-		# check if we actually got the details
-		if [ $? -ne 0 -o -z "$DETAILS" ]; then
-			echo -n "ERROR: $SYS_NUMBER $SYS_NAME: "
-			echo "unexpected get_details_by_$METHOD failure"
+		# check if we actually got the prototype
+		if [ $? -ne 0 -o -z "$PARSED_PROTOTYPE" ]; then
+			echo "ERROR: $SYS_NUMBER $SYS_NAME: failed to parse prototype"
 			exit 1
 		fi
 	fi
@@ -480,10 +541,13 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# count errors and found syscalls
 	if [ $SYS_ENTRY = "sys_ni_syscall" ]; then
 		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
+		echo "$SYS_NUMBER,$SYS_NAME,not implemented,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 0 ]; then
 		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"
+		echo "$SYS_NUMBER,$SYS_NAME,missing,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 1 ]; then
+		echo "$SYS_NUMBER,$SYS_NAME,implemented,$PARSED_PROTOTYPE" >> $OUTPUT_FILE
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
 	else
 		# this should never happen
@@ -499,9 +563,3 @@ echo
 echo "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
-
-#TEMP
-#echo
-#for DETAILS in "${DETAILS_ARR[@]}"; do
-#	echo "$DETAILS"
-#done
