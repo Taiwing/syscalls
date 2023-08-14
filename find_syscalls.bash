@@ -19,8 +19,6 @@ ARCH_NAME="${2:-x86}"
 ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
 TARGET_ABIS=("common" $ABI_NAME)
-# cleanup mode
-CLEANUP_MODE="PREPROCESSED" # ALL, PREPROCESSED, NONE
 
 # set unique ARCH_ABI identifier
 ARCH_ABI="${ARCH_NAME}"
@@ -40,11 +38,7 @@ fi
 
 # remove temporary files
 function cleanup {
-	if [ "$CLEANUP_MODE" == "ALL" ]; then
-		rm -vf tmp_${ARCH_ABI}_*
-	elif [ "$CLEANUP_MODE" == "PREPROCESSED" ]; then
-		rm -vf tmp_${ARCH_ABI}_preprocessed_*
-	fi
+	rm -f tmp_${ARCH_ABI}_*
 }
 
 # cleanup on exit
@@ -127,13 +121,6 @@ function get_kconfig {
 # set Kconfig options
 KCONFIG_OPTIONS=($(get_kconfig))
 
-#TEMP
-#echo "KCONFIG_OPTIONS:"
-#for OPTION in ${KCONFIG_OPTIONS[@]}; do
-#	echo "  $OPTION"
-#done
-#exit 0
-
 #################### DISAMBIGUATION ####################
 
 # apply Kconfig options and preprocess the file to reduce to one syscall match
@@ -178,19 +165,29 @@ VALID_HEADER_PATHS=(\
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
 	local SYS_ENTRY=$1
-	local HEADER_PATHS=($2)
+	local HEADER_PATHS=()
 	local FILES=()
 	local RESULT=0
+	local GLOB="true"
 
 	# if no header paths specified, use all valid ones
-	[ ${#HEADER_PATHS[@]} -eq 0 ] && HEADER_PATHS=(${VALID_HEADER_PATHS[@]})
+	if [ -z "$2" ]; then
+		HEADER_PATHS=(${VALID_HEADER_PATHS[@]})
+	else
+		GLOB=""
+		HEADER_PATHS=($2)
+	fi
 
-	for HEADER_PATH in ${VALID_HEADER_PATHS[@]}; do
+	local REGEX="\basmlinkage\b.*\b$SYS_ENTRY\b\("
+	for HEADER_PATH in ${HEADER_PATHS[@]}; do
 		# find by prototype declaration
-		OUTPUT=($(\
-			rg --glob '*.h' --count-matches "\basmlinkage\b.*\b$SYS_ENTRY\b\(" \
-			$HEADER_PATH
-		))
+		OUTPUT=()
+		if [ -z "$GLOB" ]; then
+			COUNT="$(rg --count-matches $REGEX $HEADER_PATH || echo 0)"
+			[ $COUNT -gt 0 ] && OUTPUT+=("$HEADER_PATH:$COUNT")
+		else
+			OUTPUT=($(rg --glob '*.h' --count-matches $REGEX $HEADER_PATH))
+		fi
 
 		for MATCH in ${OUTPUT[@]}; do
 			ARR_MATCH=(${MATCH//:/ })
@@ -281,21 +278,31 @@ function reduce_files_by_define {
 
 # find the syscall by syscall define in the source files
 function find_matching_file_by_define {
-	local SYS_ENTRY=$1
-	local SOURCE_PATHS=($2)
+	local SYS_NAME=$1
+	local SOURCE_PATHS=()
 	local FILES=()
 	local COUNTS=()
 	local RESULT=0
+	local GLOB="true"
 
 	# if no source paths specified, use all valid ones
-	[ ${#SOURCE_PATHS[@]} -eq 0 ] && SOURCE_PATHS=(${VALID_SOURCE_PATHS[@]})
+	if [ -z "$2" ]; then
+		SOURCE_PATHS=(${VALID_SOURCE_PATHS[@]})
+	else
+		GLOB=""
+		SOURCE_PATHS=($2)
+	fi
 
+	local REGEX="\bSYSCALL_DEFINE.\($SYS_NAME\b"
 	for SOURCE_PATH in ${SOURCE_PATHS[@]}; do
 		# find by syscall define
-		OUTPUT=($(\
-			rg --glob '*.c' --count-matches "\bSYSCALL_DEFINE.\($SYS_NAME\b" \
-			$SOURCE_PATH
-		))
+		OUTPUT=()
+		if [ -z "$GLOB" ]; then
+			COUNT="$(rg --count-matches $REGEX $SOURCE_PATH || echo 0)"
+			[ $COUNT -gt 0 ] && OUTPUT+=("$SOURCE_PATH:$COUNT")
+		else
+			OUTPUT=($(rg --glob '*.c' --count-matches $REGEX $SOURCE_PATH))
+		fi
 
 		for MATCH in ${OUTPUT[@]}; do
 			ARR_MATCH=(${MATCH//:/ })
@@ -341,6 +348,70 @@ function get_details_by_define {
 	rg -U "\bSYSCALL_DEFINE.\($SYS_NAME\b(?s).*?\)" $FILE
 }
 
+function find_by_prototype {
+	local SYS_NUMBER=$1
+	local SYS_NAME=$2
+	local SYS_ENTRY=$3
+	local FILES=()
+	local RESULT=0
+
+	# find the syscall by prototype in the header files
+	FILES=($(find_matching_file_by_prototype $SYS_ENTRY))
+	RESULT=$?
+
+	# if there was a single file but multiple matches
+	if [ ${#FILES[@]} -eq 1 -a $RESULT -gt 1 ]; then
+		# try to reduce the matches
+		NEW_FILE=$(preprocess_source_file "${FILES[0]}" "$SYS_NAME")
+		if [ $? -ne 0 ]; then
+			echo -n "ERROR: $SYS_NUMBER $SYS_NAME:"
+			echo " failed to preprocess ${FILES[0]}"
+			exit 1
+		fi
+
+		# check if we got a unique syscall
+		FILES=($(find_matching_file_by_prototype $SYS_ENTRY $NEW_FILE))
+		RESULT=$?
+	fi
+
+	# print the results
+	echo "${FILES[@]}"
+
+	return $RESULT
+}
+
+function find_by_define {
+	local SYS_NUMBER=$1
+	local SYS_NAME=$2
+	local SYS_ENTRY=$3
+	local FILES=()
+	local RESULT=0
+
+	# find the syscall by define in the source files
+	FILES=($(find_matching_file_by_define $SYS_NAME))
+	RESULT=$?
+
+	# if there was a single file but multiple matches
+	if [ ${#FILES[@]} -eq 1 -a $RESULT -gt 1 ]; then
+		# try to reduce the matches
+		NEW_FILE=$(preprocess_source_file "${FILES[0]}" "$SYS_NAME")
+		if [ $? -ne 0 ]; then
+			echo -n "ERROR: $SYS_NUMBER $SYS_NAME:"
+			echo " failed to preprocess ${FILES[0]}"
+			exit 1
+		fi
+
+		# check if we got a unique syscall
+		FILES=($(find_matching_file_by_define $SYS_NAME $NEW_FILE))
+		RESULT=$?
+	fi
+
+	# print the results
+	echo "${FILES[@]}"
+
+	return $RESULT
+}
+
 # find all the syscall prototypes
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
@@ -355,52 +426,46 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	SYS_ENTRY=${SCOLS[2]}
 
 	# find the syscall file
+	FILE=""
 	RESULT=0
 	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		FILES=($(find_matching_file_by_prototype $SYS_ENTRY))
-		RESULT=$?
 		METHOD="prototype"
+		FILES=($(find_by_prototype $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
+		RESULT=$?
 
-		# if we didn't get a unique syscall, try to find one by syscall define
+		# if we did not get a unique syscall, try to find it by define
 		if [ $RESULT -ne 1 ]; then
-			FILES2="$(find_matching_file_by_define $SYS_NAME)"
-			RESULT2=$?
-
-			# if we found a unique syscall or if there was no syscall
-			if [ $RESULT2 -eq 1 ] || [ $RESULT -eq 0 -a $RESULT2 -ne 0 ]; then
-				FILES=($FILES2)
-				RESULT=$RESULT2
-				METHOD="define"
-			fi
+			METHOD="define"
+			FILES=($(find_by_define $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
+			RESULT=$?
 		fi
 
-		# check if we found multiple files (this should never happen)
 		if [ ${#FILES[@]} -gt 1 ]; then
-			echo "ERROR: $SYS_NUMBER $SYS_NAME: unexpected multiple file matches"
+			# if we found multiple files (this should never happen)
+			echo -n "ERROR: $SYS_NUMBER $SYS_NAME: "
+			echo "unexpected multiple file matches"
 			for FILE in ${FILES[@]}; do
 				echo "  $FILE"
 			done
 			exit 1
-		elif [ ${#FILES[@]} -eq 1 -a $RESULT -gt 1 ]; then
-			# if there was a single file but multiple matches
-			NEW_FILE=$(preprocess_source_file "${FILES[0]}" "$SYS_NAME")
-			if [ $? -ne 0 ]; then
-				echo -n "ERROR: $SYS_NUMBER $SYS_NAME:"
-				echo " failed to preprocess ${FILES[0]}"
-				exit 1
-			fi
-			FILES=($NEW_FILE)
+		elif [ $RESULT -gt 1 ]; then
+			# if RESULT is still not 1, then pinning down the syscall failed
+			echo -n "ERROR: $SYS_NUMBER $SYS_NAME:"
+			echo " got $RESULT definitions in ${FILES[0]}"
+			exit 1
+		else
+			FILE=${FILES[0]}
 		fi
 	fi
 
 	# get details about the syscall
 	DETAILS=""
-	if [ $RESULT -eq 1 -a ${#FILES[@]} -eq 1 ]; then
+	if [ $RESULT -eq 1 ]; then
 		if [ $METHOD = "prototype" ]; then
-			DETAILS=$(get_details_by_prototype $SYS_ENTRY ${FILES[0]})
+			DETAILS=$(get_details_by_prototype $SYS_ENTRY $FILE)
 		else
-			DETAILS=$(get_details_by_define $SYS_NAME ${FILES[0]})
+			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
 			#DETAILS_ARR+=("$DETAILS")	#TEMP
 		fi
 
@@ -420,12 +485,6 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"
 	elif [ $RESULT -eq 1 ]; then
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
-	elif [ $RESULT -gt 1 ]; then
-		MULTIPLE_COUNT=$((MULTIPLE_COUNT+1))
-		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() multiple matches ($RESULT by '$METHOD')"
-		for FILE in ${FILES[@]}; do
-			echo "  $FILE"
-		done
 	else
 		# this should never happen
 		echo "ERROR: $SYS_NUMBER $SYS_NAME $SYS_ENTRY(): unexpected result ($RESULT)"
@@ -440,7 +499,6 @@ echo
 echo "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
-echo "Multiple definitions: $MULTIPLE_COUNT/${#SYS_CALLS[@]}"
 
 #TEMP
 #echo
