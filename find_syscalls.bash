@@ -19,6 +19,14 @@ ARCH_NAME="${2:-x86}"
 ABI_NAME="${3:-64}"
 # valid ABIs for this architecture
 TARGET_ABIS=("common" $ABI_NAME)
+# cleanup mode
+CLEANUP_MODE="PREPROCESSED" # ALL, PREPROCESSED, NONE
+
+# set unique ARCH_ABI identifier
+ARCH_ABI="${ARCH_NAME}"
+if [ "${ABI_NAME}" != "common" ]; then
+	ARCH_ABI="${ARCH_ABI}_$(echo ${ABI_NAME} | tr ' ' '_')"
+fi
 
 # get address size (32 or 64)
 ADDR_SIZE=0
@@ -27,6 +35,20 @@ if [[ "${ARCH_FILE}" =~ _(32|64)\.tbl ]]; then
 elif [[ "${ABI_NAME}" =~ ^(|.* )(32|64)$ ]]; then
 	ADDR_SIZE=${BASH_REMATCH[2]}
 fi
+
+#################### CLEANUP ####################
+
+# remove temporary files
+function cleanup {
+	if [ "$CLEANUP_MODE" == "ALL" ]; then
+		rm -vf tmp_${ARCH_ABI}_*
+	elif [ "$CLEANUP_MODE" == "PREPROCESSED" ]; then
+		rm -vf tmp_${ARCH_ABI}_preprocessed_*
+	fi
+}
+
+# cleanup on exit
+trap cleanup EXIT
 
 #################### PARSE SYSCALL TABLE ####################
 
@@ -66,27 +88,19 @@ done < $ARCH_FILE
 declare -A SPECIFIC_CONFIG_NAMES
 SPECIFIC_CONFIG_NAMES["x86_i386"]="X86_32 COMPAT_32"
 SPECIFIC_CONFIG_NAMES["x86_64"]="X86_64"
-SPECIFIC_CONFIG_NAMES["powerpc_nospu 32"]="PPC"
-SPECIFIC_CONFIG_NAMES["powerpc_nospu 64"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_nospu_32"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_nospu_64"]="PPC"
 SPECIFIC_CONFIG_NAMES["powerpc_spu"]="PPC"
 SPECIFIC_CONFIG_NAMES["sh"]="SUPERH"
 
 # get Kconfig options
 function get_kconfig {
 	local OPTIONS=()
-	local ARCH_ABI=""
 	local KCONFIG_KEYS=()
 	local KCONFIG_FILE="arch/$ARCH_NAME/Kconfig"
 
 	# return if Kconfig file does not exist (this means default)
 	[ ! -f $KCONFIG_FILE ] && return
-
-	# set unique ARCH_ABI identifier
-	if [ "${ABI_NAME}" != "common" ]; then
-		ARCH_ABI="${ARCH_NAME}_${ABI_NAME}"
-	else
-		ARCH_ABI="${ARCH_NAME}"
-	fi
 
 	# set KCONFIG_KEYS depending on ARCH_ABI to handle special cases
 	if [ -n "${SPECIFIC_CONFIG_NAMES[$ARCH_ABI]}" ]; then
@@ -119,6 +133,37 @@ KCONFIG_OPTIONS=($(get_kconfig))
 #	echo "  $OPTION"
 #done
 #exit 0
+
+#################### DISAMBIGUATION ####################
+
+function preprocess_source_file {
+	local SOURCE_FILE=$1
+	local SYSCALL="$(echo $2 | tr '[:lower:]' '[:upper:]')"
+
+	# file names
+	local FLAT_PATH_FILE="$(echo $SOURCE_FILE | tr '/' '_')"
+	local NO_INCLUDE_FILE="tmp_${ARCH_ABI}_no_include_${FLAT_PATH_FILE}"
+	local PREPROCESSED_FILE="tmp_${ARCH_ABI}_preprocessed_${FLAT_PATH_FILE}"
+
+	# remove include statements if not already done
+	if [ ! -f $NO_INCLUDE_FILE ]; then
+		grep -v '^\s*#\s*include\b.*' $SOURCE_FILE > $NO_INCLUDE_FILE
+	fi
+
+	# create gcc option string from Kconfig options
+	local GCC_OPTIONS="-D__ARCH_WANT_SYS_$SYSCALL"
+	for OPTION in ${KCONFIG_OPTIONS[@]}; do
+		GCC_OPTIONS="$GCC_OPTIONS -DCONFIG_$OPTION"
+	done
+
+	# preprocess the file
+	gcc -E $GCC_OPTIONS $NO_INCLUDE_FILE > $PREPROCESSED_FILE
+	[ $? -ne 0 -o ! -f $PREPROCESSED_FILE ] && return 1
+
+	# return the preprocessed file
+	echo $PREPROCESSED_FILE
+	return 0
+}
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
@@ -328,6 +373,15 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 				echo "  $FILE"
 			done
 			exit 1
+		elif [ ${#FILES[@]} -eq 1 -a $RESULT -gt 1 ]; then
+			# if there was a single file but multiple matches
+			NEW_FILE=$(preprocess_source_file "${FILES[0]}" "$SYS_NAME")
+			if [ $? -ne 0 ]; then
+				echo -n "ERROR: $SYS_NUMBER $SYS_NAME:"
+				echo " failed to preprocess ${FILES[0]}"
+				exit 1
+			fi
+			FILES=($NEW_FILE)
 		fi
 	fi
 
