@@ -154,10 +154,8 @@ function parse_syscall_prototype {
 	PARAMETER_STRING="${BASH_REMATCH[1]}"
 
 	# split and count the parameters
-	local PARAMETERS=""
-	local PARAMETER_COUNT=0
-	local TEST_PARAM_ARRAY=() #TEMP
-	local ANONYMOUS_PARAMETERS=0 #TEMP (0 = false, 1 = true)
+	local PARAMETER_ARRAY=()
+	local ANONYMOUS_PARAMETERS=0
 	while [[ "$PARAMETER_STRING" =~ ^([^,]+),?(.*)$ ]]; do
 		# tokenize the parameter and get new parameter string
 		read -ra PARAMETER -d '' <<< "${BASH_REMATCH[1]}"
@@ -167,35 +165,29 @@ function parse_syscall_prototype {
 		for INDEX in "${!PARAMETER[@]}"; do
 			[ "${PARAMETER[$INDEX]}" == "__user" ] && unset PARAMETER[$INDEX]
 		done
-		PARAMETER=("${PARAMETER[@]}") #TEMP
+		PARAMETER=("${PARAMETER[@]}")
+
+		# check if the parameter has a name
 		if [ $ANONYMOUS_PARAMETERS -eq 0 ]; then
 			parameter_has_name "${PARAMETER[@]}"
 			ANONYMOUS_PARAMETERS=$?
 		fi
 
 		# append the parameter to the list
-		if [ -z "$PARAMETERS" ]; then
-			PARAMETERS=",${PARAMETER[@]}"
-		else
-			PARAMETERS="$PARAMETERS,${PARAMETER[@]}"
-		fi
-		TEMP="${PARAMETER[@]}" #TEMP
-		TEST_PARAM_ARRAY+=("$TEMP") #TEMP
-		PARAMETER_COUNT=$((PARAMETER_COUNT+1))
+		PARAM="${PARAMETER[@]}"
+		PARAMETER_ARRAY+=("$PARAM")
 	done
 
+	#TEMP
 	if [ $ANONYMOUS_PARAMETERS -eq 1 ]; then
-		echo "anonymous parameters ($SYS_ENTRY):" >&2 #TEMP
-		for PARAM in "${TEST_PARAM_ARRAY[@]}"; do
-			echo "  $PARAM" >&2 #TEMP
+		echo "anonymous parameters ($SYS_ENTRY):" >&2
+		for PARAM in "${PARAMETER_ARRAY[@]}"; do
+			echo "  $PARAM" >&2
 		done
 	fi
 
 	# handle special case for void
-	if [ $PARAMETER_COUNT -eq 1 -a "$PARAMETERS" == ",void" ]; then
-		PARAMETERS=""
-		PARAMETER_COUNT=0
-	fi
+	[ "${PARAMETER_ARRAY[0]}" == "void" ] && PARAMETER_ARRAY=()
 
 	# get the return type
 	local RETURN_TYPE=""
@@ -203,10 +195,14 @@ function parse_syscall_prototype {
 	RETURN_TYPE="${BASH_REMATCH[1]}"
 
 	# print the prototype
-	echo -n "${RETURN_TYPE},${PARAMETER_COUNT}${PARAMETERS}"
+	PARAMETER_COUNT="${#PARAMETER_ARRAY[@]}"
+	echo -n "${RETURN_TYPE},${PARAMETER_COUNT}"
+	for PARAM in "${PARAMETER_ARRAY[@]}"; do
+		echo -n ",$PARAM"
+	done
 
 	#print remaining commas
-	for ((i=PARAMETER_COUNT; i<6; i++)); do
+	for ((i=PARAMETER_COUNT; i < 6; i++)); do
 		echo -n ","
 	done
 
