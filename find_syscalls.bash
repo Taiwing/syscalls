@@ -102,7 +102,8 @@ done < $ARCH_FILE
 #################### PARSE DECLARATIONS ####################
 
 # list of kernel types
-# output of the following command (with some manual cleanup):
+# output of the following command (with some manual cleanup, removed 'const',
+# 'struct', 'union' and 'enum' keywords):
 # awk -F ',' '{ for (i = 6; i <= 11; i++) { sub(/ .*/, "", $i); print $i } }' \
 # linux/syscalls_*.csv | sort -u | grep -v '^\(param[1-6]\|\)$'
 KERNEL_TYPES=(
@@ -114,28 +115,30 @@ KERNEL_TYPES=(
 	utrap_handler_t void
 )
 
-# list of kernel types that are multi word (const is a special case)
-MW_KERNEL_TYPES=(enum struct union)
-
 # check that parameter has a name (0 = yes, 1 = no)
 # TODO: handle multi word types (e.g. enum struct union)
 function parameter_has_name {
 	local PARAMETER=("$@")
 
 	# if the first word is a const, remove it
-	#[ "${PARAMETER[0]}" == "const" ] && PARAMETER=("${PARAMETER[@]:1}")
+	[ "${PARAMETER[0]}" == "const" ] && PARAMETER=("${PARAMETER[@]:1}")
+
+	# if the first word is a multi word type, remove it
+	if [[ "${PARAMETER[0]}" =~ ^(struct|union|enum)$ ]]; then
+		PARAMETER=("${PARAMETER[@]:1}")
+	fi
 
 	# if there is not at least two words then the parameter has no name
 	[ ${#PARAMETER[@]} -lt 2 ] && return 1
 
-	# if the last word is a KERNEL_TYPE then the parameter has no name
+	# if the last word ends with a '*' then the parameter has no name
 	LAST_WORD="${PARAMETER[-1]}"
+	[[ "$LAST_WORD" =~ \*$ ]] && return 1
+
+	# if the last word is a KERNEL_TYPE then the parameter has no name
 	for TYPE in "${KERNEL_TYPES[@]}"; do
 		[ "$LAST_WORD" == "$TYPE" ] && return 1
 	done
-
-	# if the last word ends with a '*' then the parameter has no name
-	[[ "$LAST_WORD" =~ \*$ ]] && return 1
 
 	# we assume that the parameter has a name
 	return 0
