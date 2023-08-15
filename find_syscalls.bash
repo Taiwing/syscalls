@@ -159,8 +159,9 @@ function parse_syscall_prototype {
 	local TEST_PARAM_ARRAY=() #TEMP
 	local ANONYMOUS_PARAMETERS=0 #TEMP (0 = false, 1 = true)
 	while [[ "$PARAMETER_STRING" =~ ^([^,]+),?(.*)$ ]]; do
-		# tokenize the parameter
+		# tokenize the parameter and get new parameter string
 		read -ra PARAMETER -d '' <<< "${BASH_REMATCH[1]}"
+		PARAMETER_STRING="${BASH_REMATCH[2]}"
 
 		# remove the __user annotation
 		for INDEX in "${!PARAMETER[@]}"; do
@@ -180,7 +181,6 @@ function parse_syscall_prototype {
 		fi
 		TEMP="${PARAMETER[@]}" #TEMP
 		TEST_PARAM_ARRAY+=("$TEMP") #TEMP
-		PARAMETER_STRING="${BASH_REMATCH[2]}"
 		PARAMETER_COUNT=$((PARAMETER_COUNT+1))
 	done
 
