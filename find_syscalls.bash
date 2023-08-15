@@ -85,7 +85,7 @@ while read LINE; do
 	SYS_NAME=${LCOLS[2]}
 
 	# if the syscall is not for this ABI, skip it
-	[[ ! "${TARGET_ABIS[@]}" =~ "$SYS_ABI" ]] && continue
+	[[ ! " ${TARGET_ABIS[@]} " =~ " $SYS_ABI " ]] && continue
 
 	# define SYS_ENTRY with fallback to SYS_COMPAT if needed
 	SYS_ENTRY=""
