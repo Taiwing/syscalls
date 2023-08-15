@@ -143,6 +143,28 @@ function parameter_has_name {
 	return 0
 }
 
+# format parameter (remove '__user' qualifier and split '*' instances)
+# output is stored in the global variable FORMATTED_PARAMETER
+FORMATTED_PARAMETER=()
+function format_parameter {
+	local PARAMETER=("$@")
+	FORMATTED_PARAMETER=()
+
+	for PARAM in "${PARAMETER[@]}"; do
+		# if this is the __user qualifier, skip it
+		[ "$PARAM" == "__user" ] && continue
+
+		# while the token starts with a '*' split it from the string
+		while [[ "$PARAM" =~ ^\*(.+)$ ]]; do
+			PARAM="${BASH_REMATCH[1]}"
+			FORMATTED_PARAMETER+=("*")
+		done
+
+		# append the parameter to the list
+		FORMATTED_PARAMETER+=("$PARAM")
+	done
+}
+
 # parse syscall prototype from the header files
 function parse_syscall_prototype {
 	local SYS_ENTRY="$1"
@@ -157,25 +179,19 @@ function parse_syscall_prototype {
 	local PARAMETER_ARRAY=()
 	local ANONYMOUS_PARAMETERS=0
 	while [[ "$PARAMETER_STRING" =~ ^([^,]+),?(.*)$ ]]; do
-		# tokenize the parameter and get new parameter string
-		read -ra PARAMETER -d '' <<< "${BASH_REMATCH[1]}"
+		# format the parameter and get the new string
 		PARAMETER_STRING="${BASH_REMATCH[2]}"
-
-		# remove the __user annotation
-		for INDEX in "${!PARAMETER[@]}"; do
-			[ "${PARAMETER[$INDEX]}" == "__user" ] && unset PARAMETER[$INDEX]
-		done
-		PARAMETER=("${PARAMETER[@]}")
+		read -ra PARAMETER -d '' <<< "${BASH_REMATCH[1]}"
+		format_parameter "${PARAMETER[@]}"
+		PARAMETER=("${FORMATTED_PARAMETER[@]}")
+		FLATTENED_PARAMETER="${PARAMETER[@]}"
+		PARAMETER_ARRAY+=("$FLATTENED_PARAMETER")
 
 		# check if the parameter has a name
 		if [ $ANONYMOUS_PARAMETERS -eq 0 ]; then
 			parameter_has_name "${PARAMETER[@]}"
 			ANONYMOUS_PARAMETERS=$?
 		fi
-
-		# append the parameter to the list
-		PARAM="${PARAMETER[@]}"
-		PARAMETER_ARRAY+=("$PARAM")
 	done
 
 	#TEMP
@@ -230,24 +246,22 @@ function parse_syscall_define {
 	[[ "$PROTOTYPE" =~ ^$SYS_NAME,(.*)$ ]] || return 1
 	PROTOTYPE="${BASH_REMATCH[1]}"
 	local COUNT=0
-	local PARAMETERS=""
+	local PARAMETER=()
 	while [[ "$PROTOTYPE" =~ ^([^,]+),([^,]+),?(.*)$ ]]; do
-		# tokenize the parameter type and name
+		# tokenize the parameter type and name and format the parameter
+		PROTOTYPE="${BASH_REMATCH[3]}"
 		read -ra PTYPE -d '' <<< "${BASH_REMATCH[1]}"
 		read -ra PNAME -d '' <<< "${BASH_REMATCH[2]}"
-
-		# remove the __user annotation
-		for INDEX in "${!PTYPE[@]}"; do
-			[ "${PTYPE[$INDEX]}" == "__user" ] && unset PTYPE[$INDEX]
-		done
+		PARAMETER=("${PTYPE[@]}" "${PNAME[@]}")
+		format_parameter "${PARAMETER[@]}"
+		PARAMETER=("${FORMATTED_PARAMETER[@]}")
 
 		# append the parameter to the list
 		if [ -z "$PARAMETERS" ]; then
-			PARAMETERS=",${PTYPE[@]} ${PNAME[@]}"
+			PARAMETERS=",${PARAMETER[@]}"
 		else
-			PARAMETERS="$PARAMETERS,${PTYPE[@]} ${PNAME[@]}"
+			PARAMETERS="$PARAMETERS,${PARAMETER[@]}"
 		fi
-		PROTOTYPE="${BASH_REMATCH[3]}"
 
 		# increment the parameter count
 		COUNT=$((COUNT+1))
