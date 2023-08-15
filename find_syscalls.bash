@@ -116,7 +116,6 @@ KERNEL_TYPES=(
 )
 
 # check that parameter has a name (0 = yes, 1 = no)
-# TODO: handle multi word types (e.g. enum struct union)
 function parameter_has_name {
 	local PARAMETER=("$@")
 
