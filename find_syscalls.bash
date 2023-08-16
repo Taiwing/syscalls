@@ -371,18 +371,18 @@ function find_matching_file_by_prototype {
 		PROTOTYPE_PATHS=($2)
 	fi
 
-	local REGEX="\basmlinkage\b.*\b$SYS_ENTRY\b\("
+	local REGEX="\basmlinkage\b[^()]*\b$SYS_ENTRY\b\("
 	for PROTOTYPE_PATH in ${PROTOTYPE_PATHS[@]}; do
 		# find by prototype declaration
 		OUTPUT=()
 		if [ -z "$2" ]; then
-			OUTPUT=($(rg --glob '*.h' --count-matches $REGEX $PROTOTYPE_PATH))
-			# if no matches, fallback on *.c files
+			OUTPUT=($(rg -U --glob '*.c' --count-matches $REGEX $PROTOTYPE_PATH))
+			# if no matches, fallback on *.h files
 			if [ ${#OUTPUT[@]} -eq 0 ]; then
-				OUTPUT=($(rg --glob '*.c' --count-matches $REGEX $PROTOTYPE_PATH))
+				OUTPUT=($(rg -U --glob '*.h' --count-matches $REGEX $PROTOTYPE_PATH))
 			fi
 		else
-			COUNT="$(rg --count-matches $REGEX $PROTOTYPE_PATH || echo 0)"
+			COUNT="$(rg -U --count-matches $REGEX $PROTOTYPE_PATH || echo 0)"
 			[ $COUNT -gt 0 ] && OUTPUT+=("$PROTOTYPE_PATH:$COUNT")
 		fi
 
@@ -527,7 +527,7 @@ function get_details_by_prototype {
 	local FILE=$2
 
 	# get the full prototype
-	rg -U "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);?" $FILE
+	rg -U "\basmlinkage\b[^()]*\b$SYS_ENTRY\b\((?s).*?\);?" $FILE
 }
 
 # get the full syscall define
