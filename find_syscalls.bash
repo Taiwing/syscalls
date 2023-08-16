@@ -165,7 +165,7 @@ function format_parameter {
 	done
 }
 
-# parse syscall prototype from the header files
+# parse syscall prototype from the source files
 function parse_syscall_prototype {
 	local SYS_ENTRY="$1"
 	local PROTOTYPE="$2"
@@ -357,7 +357,7 @@ VALID_PROTOTYPE_PATHS=(\
 	"include/linux/"
 )
 
-# find the syscall by function prototype in the header files
+# find the syscall by function prototype in the source files
 function find_matching_file_by_prototype {
 	local SYS_ENTRY=$1
 	local PROTOTYPE_PATHS=()
@@ -546,7 +546,7 @@ function find_by_prototype {
 	local FILES=()
 	local RESULT=0
 
-	# find the syscall by prototype in the header files
+	# find the syscall by prototype in the source files
 	FILES=($(find_matching_file_by_prototype $SYS_ENTRY))
 	RESULT=$?
 
