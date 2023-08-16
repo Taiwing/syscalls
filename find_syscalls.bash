@@ -172,7 +172,7 @@ function parse_syscall_prototype {
 
 	# get the parameters
 	local PARAMETER_STRING=""
-	[[ "$PROTOTYPE" =~ \((.*)\)\;$ ]] || return 1
+	[[ "$PROTOTYPE" =~ \((.*)\)\;?$ ]] || return 1
 	PARAMETER_STRING="${BASH_REMATCH[1]}"
 
 	# split and count the parameters
@@ -374,6 +374,10 @@ function find_matching_file_by_prototype {
 		OUTPUT=()
 		if [ -z "$2" ]; then
 			OUTPUT=($(rg --glob '*.h' --count-matches $REGEX $PROTOTYPE_PATH))
+			# if no matches, fallback on *.c files
+			if [ ${#OUTPUT[@]} -eq 0 ]; then
+				OUTPUT=($(rg --glob '*.c' --count-matches $REGEX $PROTOTYPE_PATH))
+			fi
 		else
 			COUNT="$(rg --count-matches $REGEX $PROTOTYPE_PATH || echo 0)"
 			[ $COUNT -gt 0 ] && OUTPUT+=("$PROTOTYPE_PATH:$COUNT")
@@ -520,7 +524,7 @@ function get_details_by_prototype {
 	local FILE=$2
 
 	# get the full prototype
-	rg -U "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);" $FILE
+	rg -U "\basmlinkage\b.*\b$SYS_ENTRY\b\((?s).*?\);?" $FILE
 }
 
 # get the full syscall define
