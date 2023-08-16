@@ -674,7 +674,7 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# count errors and found syscalls
 	if [ $SYS_ENTRY = "sys_ni_syscall" ]; then
 		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
-		echo "$SYS_NUMBER,$SYS_NAME,not implemented,,,,,,,," >> $OUTPUT_FILE
+		echo "$SYS_NUMBER,$SYS_NAME,todo,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 0 ]; then
 		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"
@@ -685,7 +685,13 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() has anonymous parameters"
 			ANONYMOUS_PARAMETERS_COUNT=$((ANONYMOUS_PARAMETERS_COUNT+1))
 		fi
-		echo "$SYS_NUMBER,$SYS_NAME,implemented,$PARSED_PROTOTYPE" >> $OUTPUT_FILE
+		echo -n "$SYS_NUMBER,$SYS_NAME," >> $OUTPUT_FILE
+		if [ $PARSED -eq 2 ]; then
+			echo -n "anon," >> $OUTPUT_FILE
+		else
+			echo -n "ok," >> $OUTPUT_FILE
+		fi
+		echo "$PARSED_PROTOTYPE" >> $OUTPUT_FILE
 	else
 		# this should never happen
 		echo "ERROR: $SYS_NUMBER $SYS_NAME $SYS_ENTRY(): unexpected result ($RESULT)"
