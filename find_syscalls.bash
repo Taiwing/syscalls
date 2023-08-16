@@ -194,14 +194,6 @@ function parse_syscall_prototype {
 		fi
 	done
 
-	#TEMP
-	if [ $ANONYMOUS_PARAMETERS -eq 1 ]; then
-		echo "anonymous parameters ($SYS_ENTRY):" >&2
-		for PARAM in "${PARAMETER_ARRAY[@]}"; do
-			echo "  $PARAM" >&2
-		done
-	fi
-
 	# handle special case for void
 	[ "${PARAMETER_ARRAY[0]}" == "void" ] && PARAMETER_ARRAY=()
 
@@ -222,7 +214,8 @@ function parse_syscall_prototype {
 		echo -n ","
 	done
 
-	return 0
+	# return error if there are anonymous parameters (but not fail)
+	[ $ANONYMOUS_PARAMETERS -eq 1 ] && return 2 || return 0
 }
 
 # parse syscall define from the source files
@@ -237,10 +230,7 @@ function parse_syscall_define {
 	PROTOTYPE="${BASH_REMATCH[2]}"
 
 	# if there are no parameters we can print the prototype and return
-	if [ $PARAMETER_COUNT -eq 0 ]; then
-		echo -n "long,0,,,,,,"
-		return 0
-	fi
+	[ $PARAMETER_COUNT -eq 0 ] && echo -n "long,0,,,,,," && return 0
 
 	# get the parameters
 	[[ "$PROTOTYPE" =~ ^$SYS_NAME,(.*)$ ]] || return 1
@@ -618,7 +608,7 @@ function find_by_define {
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
-MULTIPLE_COUNT=0
+ANONYMOUS_PARAMETERS_COUNT=0
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	SCOLS=(${SYSCALL})
@@ -661,6 +651,7 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	fi
 
 	# get details about the syscall
+	PARSED=0
 	PARSED_PROTOTYPE=""
 	if [ $RESULT -eq 1 ]; then
 		DETAILS=""
@@ -671,9 +662,10 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
 		fi
+		PARSED=$?
 
 		# check if we actually got the prototype
-		if [ $? -ne 0 -o -z "$PARSED_PROTOTYPE" ]; then
+		if [ $PARSED -eq 1 -o -z "$PARSED_PROTOTYPE" ]; then
 			echo "ERROR: $SYS_NUMBER $SYS_NAME: failed to parse prototype"
 			echo $DETAILS
 			exit 1
@@ -689,8 +681,12 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"
 		echo "$SYS_NUMBER,$SYS_NAME,missing,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 1 ]; then
-		echo "$SYS_NUMBER,$SYS_NAME,implemented,$PARSED_PROTOTYPE" >> $OUTPUT_FILE
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
+		if [ $PARSED -eq 2 ]; then
+			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() has anonymous parameters"
+			ANONYMOUS_PARAMETERS_COUNT=$((ANONYMOUS_PARAMETERS_COUNT+1))
+		fi
+		echo "$SYS_NUMBER,$SYS_NAME,implemented,$PARSED_PROTOTYPE" >> $OUTPUT_FILE
 	else
 		# this should never happen
 		echo "ERROR: $SYS_NUMBER $SYS_NAME $SYS_ENTRY(): unexpected result ($RESULT)"
@@ -702,6 +698,11 @@ done
 
 # print the results
 echo
-echo "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
+echo -n "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
+if [ $ANONYMOUS_PARAMETERS_COUNT -gt 0 ]; then
+	echo " ($ANONYMOUS_PARAMETERS_COUNT with anonymous parameters)"
+else
+	echo
+fi
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
