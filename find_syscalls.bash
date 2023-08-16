@@ -195,7 +195,10 @@ function parse_syscall_prototype {
 	done
 
 	# handle special case for void
-	[ "${PARAMETER_ARRAY[0]}" == "void" ] && PARAMETER_ARRAY=()
+	if [ "${#PARAMETER_ARRAY[@]}" -eq 1 -a "${PARAMETER_ARRAY[0]}" == "void" ]; then
+		PARAMETER_ARRAY=()
+		ANONYMOUS_PARAMETERS=0
+	fi
 
 	# get the return type
 	local RETURN_TYPE=""
