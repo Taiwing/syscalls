@@ -31,7 +31,7 @@ cd $LINUX_PATH
 
 # path to the syscall table file
 ARCH_FILE="${1:-arch/x86/entry/syscalls/syscall_64.tbl}"
-# architecture name (for the header path)
+# architecture name (for the prototype path)
 ARCH_NAME="${2:-x86}"
 # ABI name (for the syscall table)
 ABI_NAME="${3:-64}"
@@ -347,8 +347,8 @@ function preprocess_source_file {
 
 #################### FIND SYSCALL DECLARATIONS ####################
 
-# header paths in priority order
-VALID_HEADER_PATHS=(\
+# prototype paths in priority order
+VALID_PROTOTYPE_PATHS=(\
 	"arch/$ARCH_NAME/"
 	"include/asm-generic/"
 	"include/linux/"
@@ -357,28 +357,26 @@ VALID_HEADER_PATHS=(\
 # find the syscall by function prototype in the header files
 function find_matching_file_by_prototype {
 	local SYS_ENTRY=$1
-	local HEADER_PATHS=()
+	local PROTOTYPE_PATHS=()
 	local FILES=()
 	local RESULT=0
-	local GLOB="true"
 
-	# if no header paths specified, use all valid ones
+	# if no prototype path specified, use all valid ones
 	if [ -z "$2" ]; then
-		HEADER_PATHS=(${VALID_HEADER_PATHS[@]})
+		PROTOTYPE_PATHS=(${VALID_PROTOTYPE_PATHS[@]})
 	else
-		GLOB=""
-		HEADER_PATHS=($2)
+		PROTOTYPE_PATHS=($2)
 	fi
 
 	local REGEX="\basmlinkage\b.*\b$SYS_ENTRY\b\("
-	for HEADER_PATH in ${HEADER_PATHS[@]}; do
+	for PROTOTYPE_PATH in ${PROTOTYPE_PATHS[@]}; do
 		# find by prototype declaration
 		OUTPUT=()
-		if [ -z "$GLOB" ]; then
-			COUNT="$(rg --count-matches $REGEX $HEADER_PATH || echo 0)"
-			[ $COUNT -gt 0 ] && OUTPUT+=("$HEADER_PATH:$COUNT")
+		if [ -z "$2" ]; then
+			OUTPUT=($(rg --glob '*.h' --count-matches $REGEX $PROTOTYPE_PATH))
 		else
-			OUTPUT=($(rg --glob '*.h' --count-matches $REGEX $HEADER_PATH))
+			COUNT="$(rg --count-matches $REGEX $PROTOTYPE_PATH || echo 0)"
+			[ $COUNT -gt 0 ] && OUTPUT+=("$PROTOTYPE_PATH:$COUNT")
 		fi
 
 		for MATCH in ${OUTPUT[@]}; do
@@ -399,15 +397,15 @@ function find_matching_file_by_prototype {
 }
 
 # build a list of all the syscall source directories
-RAW_SOURCE_PATHS=$(\
+RAW_DEFINE_PATHS=$(\
 	find . -maxdepth 1 -type d -not -name 'arch' -not -name '.*' \
 	| tr -d './' \
 	| sort
 )
-VALID_SOURCE_PATHS=("arch/$ARCH_NAME") # in priority order
-for DIRECTORY in $RAW_SOURCE_PATHS; do
+VALID_DEFINE_PATHS=("arch/$ARCH_NAME") # in priority order
+for DIRECTORY in $RAW_DEFINE_PATHS; do
 	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
-		VALID_SOURCE_PATHS+=($DIRECTORY)
+		VALID_DEFINE_PATHS+=($DIRECTORY)
 	fi
 done
 
@@ -471,29 +469,23 @@ function reduce_files_by_define {
 # find the syscall by syscall define in the source files
 function find_matching_file_by_define {
 	local SYS_NAME=$1
-	local SOURCE_PATHS=()
+	local DEFINE_PATHS=()
 	local FILES=()
 	local COUNTS=()
 	local RESULT=0
-	local GLOB="true"
 
-	# if no source paths specified, use all valid ones
-	if [ -z "$2" ]; then
-		SOURCE_PATHS=(${VALID_SOURCE_PATHS[@]})
-	else
-		GLOB=""
-		SOURCE_PATHS=($2)
-	fi
+	# if no define paths specified, use all valid ones
+	[ -z "$2" ] && DEFINE_PATHS=(${VALID_DEFINE_PATHS[@]}) || DEFINE_PATHS=($2)
 
 	local REGEX="\bSYSCALL_DEFINE.\($SYS_NAME\b"
-	for SOURCE_PATH in ${SOURCE_PATHS[@]}; do
+	for DEFINE_PATH in ${DEFINE_PATHS[@]}; do
 		# find by syscall define
 		OUTPUT=()
-		if [ -z "$GLOB" ]; then
-			COUNT="$(rg --count-matches $REGEX $SOURCE_PATH || echo 0)"
-			[ $COUNT -gt 0 ] && OUTPUT+=("$SOURCE_PATH:$COUNT")
+		if [ -z "$2" ]; then
+			OUTPUT=($(rg --glob '*.c' --count-matches $REGEX $DEFINE_PATH))
 		else
-			OUTPUT=($(rg --glob '*.c' --count-matches $REGEX $SOURCE_PATH))
+			COUNT="$(rg --count-matches $REGEX $DEFINE_PATH || echo 0)"
+			[ $COUNT -gt 0 ] && OUTPUT+=("$DEFINE_PATH:$COUNT")
 		fi
 
 		for MATCH in ${OUTPUT[@]}; do
