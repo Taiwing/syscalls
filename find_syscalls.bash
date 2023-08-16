@@ -202,7 +202,7 @@ function parse_syscall_prototype {
 
 	# get the return type
 	local RETURN_TYPE=""
-	[[ "$PROTOTYPE" =~ ^asmlinkage[[:space:]]+([^\(]+)[[:space:]]+$SYS_ENTRY\(.*$ ]] || return 1
+	[[ "$PROTOTYPE" =~ ^asmlinkage[[:space:]]+([^\(]+)[[:space:]]+$SYS_ENTRY[[:space:]]?\(.*$ ]] || return 1
 	RETURN_TYPE="${BASH_REMATCH[1]}"
 
 	# print the prototype
@@ -371,7 +371,7 @@ function find_matching_file_by_prototype {
 		PROTOTYPE_PATHS=($2)
 	fi
 
-	local REGEX="\basmlinkage\b[^()]*\b$SYS_ENTRY\b\("
+	local REGEX="\basmlinkage\b[^()]*\b$SYS_ENTRY\b\s?\("
 	for PROTOTYPE_PATH in ${PROTOTYPE_PATHS[@]}; do
 		# find by prototype declaration
 		OUTPUT=()
@@ -527,7 +527,7 @@ function get_details_by_prototype {
 	local FILE=$2
 
 	# get the full prototype
-	rg -U "\basmlinkage\b[^()]*\b$SYS_ENTRY\b\((?s).*?\);?" $FILE
+	rg -U "\basmlinkage\b[^()]*\b$SYS_ENTRY\b\s?\((?s).*?\);?" $FILE
 }
 
 # get the full syscall define
