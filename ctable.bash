@@ -31,10 +31,10 @@ HEADER_FILE="syscall_table_${ARCH_ABI}.h"
 ################################################################################
 
 # create the output file
-echo "#include \"syscalls.h\"" > "$OUTPUT_FILE"
+echo "#include \"syscall.h\"" > "$OUTPUT_FILE"
 echo >> "$OUTPUT_FILE"
-echo -n "const t_syscall_entry	${ARCH_ABI}_" >> "$OUTPUT_FILE"
-echo -n "syscall_table[${UPPER_ARCH_ABI}_SYSCALL_TABLE_SIZE]" >> "$OUTPUT_FILE"
+echo -n "const t_syscall	g_syscall_${ARCH_ABI}" >> "$OUTPUT_FILE"
+echo -n "[G_SYSCALL_${UPPER_ARCH_ABI}]" >> "$OUTPUT_FILE"
 echo "= {" >> "$OUTPUT_FILE"
 
 ################################################################################
@@ -68,12 +68,12 @@ while read LINE; do
 	echo -n "	[$INDEX] = {" >> "$OUTPUT_FILE"
 	echo -n " \"$NAME\"" >> "$OUTPUT_FILE"
 	echo -n ", $RETURN_TYPE" >> "$OUTPUT_FILE"
-	echo -n ", $ARG1" >> "$OUTPUT_FILE"
+	echo -n ", { $ARG1" >> "$OUTPUT_FILE"
 	echo -n ", $ARG2" >> "$OUTPUT_FILE"
 	echo -n ", $ARG3" >> "$OUTPUT_FILE"
 	echo -n ", $ARG4" >> "$OUTPUT_FILE"
 	echo -n ", $ARG5" >> "$OUTPUT_FILE"
-	echo -n ", $ARG6" >> "$OUTPUT_FILE"
+	echo -n ", $ARG6 }" >> "$OUTPUT_FILE"
 	echo " }," >> "$OUTPUT_FILE"
 done < "$CSV_FILE"
 
@@ -86,10 +86,11 @@ echo "};" >> "$OUTPUT_FILE"
 
 # create the header file
 echo "#pragma once" > "$HEADER_FILE"
-echo "#include \"syscalls.h\"" >> "$HEADER_FILE"
+echo "#include \"syscall.h\"" >> "$HEADER_FILE"
 echo >> "$HEADER_FILE"
 MAX_INDEX=$((MAX_INDEX + 1))
-echo "#define ${UPPER_ARCH_ABI}_SYSCALL_TABLE_SIZE $MAX_INDEX" >> "$HEADER_FILE"
+echo "#define G_SYSCALL_${UPPER_ARCH_ABI} $MAX_INDEX" >> "$HEADER_FILE"
 echo >> "$HEADER_FILE"
-echo "extern const t_syscall_entry	${ARCH_ABI}_syscall_table[];" >> "$HEADER_FILE"
+echo -n "extern const t_syscall	g_syscall_" >> "$HEADER_FILE"
+echo "${ARCH_ABI}[G_SYSCALL_${UPPER_ARCH_ABI}];" >> "$HEADER_FILE"
 echo >> "$HEADER_FILE"
