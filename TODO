@@ -1,13 +1,13 @@
 --- TODO ---
 
 front:
-	- create index page for the syscall site
-	- add an 'about' section on the home page explaining what this does and how
-	  it came to be (linking to the ft_strace project for posterity)
 	- add the date of the last refresh on the home page (BIG)
 	- hide the status, return value and param count with css
 	- beautify with css (colorhunt for classy color scheme)
-	- gather every part into one script to rule them all
+	- link to the raw csv files on each arch page and add an archive on the
+	  Home page to get them all at once
+	- add an 'about' section on the home page explaining what this does and how
+	  it came to be (linking to the ft_strace project for posterity)
 
 find_syscalls:
 	- generate the csv file for the generic interface too (super important!!!)
@@ -15,3 +15,8 @@ find_syscalls:
 
 repo:
 	- create README.md file explaining what this is about
+	- gather every part into one script to rule them all
+	- automate the process of updating the kernel submodule, finding the new
+	  syscalls if any (so re-generating the csv files), re-creating the front
+	  and rebuilding/restarting the docker compose (maybe even automate some git
+	  actions), then add a cronjob on the host machine
