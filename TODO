@@ -14,6 +14,7 @@ find_syscalls:
 
 repo:
 	- create README.md file explaining what this is about
+	- maybe actually use a Makefile for building the front (would be kinda cool)
 	- gather every part into one script to rule them all
 	- automate the process of updating the kernel submodule, finding the new
 	  syscalls if any (so re-generating the csv files), re-creating the front
