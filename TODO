@@ -2,7 +2,6 @@
 
 front:
 	- add the date of the last refresh on the home page (BIG)
-	- hide the status, return value and param count with css
 	- beautify with css (colorhunt for classy color scheme)
 	- link to the raw csv files on each arch page and add an archive on the
 	  Home page to get them all at once

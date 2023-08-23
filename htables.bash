@@ -37,6 +37,7 @@ cat << EOF >> "$OUTPUT_FILE"
 	<head>
 		<meta charset="utf-8">
 		<title>syscall table ${ARCH_ABI}</title>
+		<link rel="stylesheet" href="../style/arch.css">
 	</head>
 	<body>
 		<table>
