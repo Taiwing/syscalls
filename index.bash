@@ -52,6 +52,7 @@ EOF
 print_syscalls() {
     cat <<EOF
 		<h1>Syscalls</h1>
+		<a href="csv/syscalls.tar.gz" download>Download all syscalls as CSV</a>
 		<ul>
 EOF
     for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR}); do
