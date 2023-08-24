@@ -53,7 +53,7 @@ elif [[ "${ABI_NAME}" =~ ^(|.* )(32|64)$ ]]; then
 fi
 
 # output file
-OUTPUT_DIR="../csv"
+OUTPUT_DIR="../front/csv"
 mkdir -p $OUTPUT_DIR
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.csv"
 echo -n "nr,name,status,return_type,param_count," > $OUTPUT_FILE

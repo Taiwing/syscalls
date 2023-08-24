@@ -40,6 +40,8 @@ cat << EOF >> "$OUTPUT_FILE"
 		<link rel="stylesheet" href="../style/arch.css">
 	</head>
 	<body>
+		<h1>syscall table ${ARCH_ABI}</h1>
+		<a href="../csv/${ARCH_ABI}.csv" download>Download as a CSV</a>
 		<table>
 			<thead>
 				<tr>
