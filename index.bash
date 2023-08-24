@@ -52,6 +52,7 @@ EOF
 print_syscalls() {
     cat <<EOF
 		<h1>Syscalls</h1>
+		<p>Last update: $(date -R)</p>
 		<a href="csv/syscalls.tar.gz" download>Download all syscalls as CSV</a>
 		<ul>
 EOF

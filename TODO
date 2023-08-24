@@ -1,7 +1,6 @@
 --- TODO ---
 
 front:
-	- add the date of the last refresh on the home page (BIG)
 	- beautify with css (colorhunt for classy color scheme)
 	- add an 'about' section on the home page explaining what this does and how
 	  it came to be (linking to the ft_strace project for posterity)
