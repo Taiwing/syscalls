@@ -23,7 +23,7 @@ copyright_years() {
 print_head() {
 	local PAGE_TITLE="${1}"
 	local STYLE_PATH="${2}"
-	local INCLUDE_ARCH_CSS="${3}"
+	local SPECIFIC_CSS="${3}"
 
     cat <<EOF
 <!DOCTYPE html>
@@ -33,15 +33,15 @@ print_head() {
 		<meta name="author" content="${WEBSITE_AUTHOR}">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>${WEBSITE_NAME} - ${PAGE_TITLE}</title>
+		<link rel="stylesheet" href="${STYLE_PATH}/global.css">
 EOF
-	if [ -n "${INCLUDE_ARCH_CSS}" ]; then
+	if [ -n "${SPECIFIC_CSS}" ]; then
 		cat <<EOF
-		<link rel="stylesheet" href="${STYLE_PATH}/arch.css">
+		<link rel="stylesheet" href="${STYLE_PATH}/${SPECIFIC_CSS}.css">
 EOF
 	fi
 
 	cat <<EOF
-		<link rel="stylesheet" href="${STYLE_PATH}/global.css">
 	</head>
 	<body>
 		<header>

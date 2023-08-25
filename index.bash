@@ -30,6 +30,21 @@ print_main() {
 				code. The script that does this is executed at regular
 				intervals, therefore it should always be up-to-date.
 			</p>
+			<p id="csv-download">
+				<a href="csv/syscalls.tar.gz" download>
+					Download all syscalls as CSV
+				</a>
+			</p>
+			<ul>
+EOF
+    for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR}); do
+		ARCH="$(basename "${SYSCALL_PAGE}" .html)"
+		cat <<EOF
+				<li><a href="${ARCH_DIR}/${SYSCALL_PAGE}">${ARCH}</a></li>
+EOF
+    done
+    cat <<EOF
+			</ul>
 			<p>
 				The syscall lists are always complete, meaning that there won't
 				be any missing syscall. However, some syscalls might not have
@@ -62,21 +77,6 @@ print_main() {
 				<a href="https://github.com/Taiwing/syscalls">github</a>
 				repository.
 			</p>
-			<p>
-				<a href="csv/syscalls.tar.gz" download>
-					Download all syscalls as CSV
-				</a>
-			</p>
-			<ul>
-EOF
-    for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR}); do
-		ARCH="$(basename "${SYSCALL_PAGE}" .html)"
-		cat <<EOF
-				<li><a href="${ARCH_DIR}/${SYSCALL_PAGE}">${ARCH}</a></li>
-EOF
-    done
-    cat <<EOF
-			</ul>
 		</main>
 EOF
 }
@@ -89,7 +89,7 @@ EOF
 source ./template.bash
 
 main() {
-    print_head "Home" "style" > "${OUTPUT_FILE}"
+    print_head "Home" "style" "home" > "${OUTPUT_FILE}"
     print_main >> "${OUTPUT_FILE}"
     print_tail >> "${OUTPUT_FILE}"
 }

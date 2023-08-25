@@ -1,0 +1,19 @@
+main p {
+	width: 70%;
+}
+
+main ul {
+	display: flex;
+	flex-direction: column;
+}
+
+#csv-download {
+	display: flex;
+	justify-content: center;
+}
+
+@media only screen and (max-width: 800px) {
+	main p, main ul {
+		width: 100%;
+	}
+}

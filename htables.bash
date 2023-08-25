@@ -33,7 +33,7 @@ source ./template.bash
 ################################################################################
 
 # create the output file
-print_head "$ARCH_ABI" "../style" "yes" > "$OUTPUT_FILE"
+print_head "$ARCH_ABI" "../style" "arch" > "$OUTPUT_FILE"
 cat << EOF >> "$OUTPUT_FILE"
 		<main>
 			<p>
