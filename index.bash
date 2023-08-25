@@ -59,7 +59,7 @@ print_main() {
 				source code. It should be accurate, complete and up-to-date.
 				However, if you find any error, please feel free to report it on
 				the
-				<a href="https://github.com/Taiwing/syscalls/issues">github</a>
+				<a href="https://github.com/Taiwing/syscalls">github</a>
 				repository.
 			</p>
 			<a href="csv/syscalls.tar.gz" download>

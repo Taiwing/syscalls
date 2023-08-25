@@ -26,7 +26,7 @@ header {
 	justify-content: space-between;
 	font-size: 1rem;
 	box-sizing: border-box;
-	padding: 2rem 0.75rem;
+	padding: 0 0.75rem;
 	flex-grow: 0;
 	flex-shrink: 0;
 }
@@ -48,7 +48,7 @@ footer {
 	display: flex;
 	flex-direction: row;
 	box-sizing: border-box;
-	padding: 2rem 0.75rem;
+	padding: 0 0.75rem;
 	width: 100%;
 	flex-grow: 0;
 	flex-shrink: 0;
