@@ -31,10 +31,11 @@ print_header() {
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	    <meta charset="utf-8">
-	    <title>${WEBSITE_NAME} - Home</title>
-	    <meta name="author" content="${WEBSITE_AUTHOR}">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+		<meta name="author" content="${WEBSITE_AUTHOR}">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>${WEBSITE_NAME} - Home</title>
+		<link rel="stylesheet" href="style/global.css">
 	</head>
 	<body>
 EOF
