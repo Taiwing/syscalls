@@ -3,6 +3,9 @@
 # This script iterates over all syscall tables in the linux kernel source code
 # and calls find_syscalls.bash for each architecture and ABI pair possible.
 
+# set the path to the root of the git repository
+ROOT="$(git rev-parse --show-toplevel)"
+
 # arguments:
 # 1. target architecture
 # 2. target ABI
@@ -11,7 +14,7 @@ ABI_NAME_ARG="$2"
 ABI_NAME_ARG_OLD=""
 
 # path to the linux kernel source code
-LINUX_PATH="./linux"
+LINUX_PATH="${ROOT}/linux"
 
 # path to the syscall tables
 TABLE_FILES=$(find ${LINUX_PATH}/arch -type f -name 'syscall*.tbl')

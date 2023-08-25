@@ -15,13 +15,16 @@
 # Configuration
 ################################################################################
 
+# Set the path to the root of the git repository
+ROOT="$(git rev-parse --show-toplevel)"
+
 # the csv file
 CSV_FILE="$1"
 # the architecture
 ARCH_ABI="$(basename "$CSV_FILE")"
 ARCH_ABI="${ARCH_ABI%.*}"
 # output file
-OUTPUT_DIR="./front/src/arch"
+OUTPUT_DIR="${ROOT}/front/src/arch"
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.html"
 
 # include the template functions

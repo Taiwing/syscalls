@@ -1,4 +1,4 @@
-FRONT_DIR := front
+FRONT_DIR := ../front
 CSV_DIR := ${FRONT_DIR}/csv
 SRC_DIR := ${FRONT_DIR}/src
 ARCH_DIR := ${SRC_DIR}/arch

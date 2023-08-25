@@ -25,8 +25,11 @@
 
 #################### SCRIPT CONFIGURATION ####################
 
+# set the path to the root of the git repository
+ROOT="$(git rev-parse --show-toplevel)"
+
 # path to the linux kernel source code
-LINUX_PATH="./linux"
+LINUX_PATH="${ROOT}/linux"
 cd $LINUX_PATH
 
 # path to the syscall table file
@@ -53,7 +56,7 @@ elif [[ "${ABI_NAME}" =~ ^(|.* )(32|64)$ ]]; then
 fi
 
 # output file
-OUTPUT_DIR="../front/csv"
+OUTPUT_DIR="${ROOT}/front/csv"
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.csv"
 echo -n "nr,name,status,return_type,param_count," > $OUTPUT_FILE
 echo "param1,param2,param3,param4,param5,param6" >> $OUTPUT_FILE

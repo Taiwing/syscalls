@@ -8,8 +8,11 @@
 # Configuration
 ################################################################################
 
+# Set the path to the root of the git repository
+ROOT="$(git rev-parse --show-toplevel)"
+
 # output file
-OUTPUT_DIR="./front/src"
+OUTPUT_DIR="${ROOT}/front/src"
 OUTPUT_FILE="${OUTPUT_DIR}/index.html"
 
 # syscall pages

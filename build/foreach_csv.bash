@@ -4,8 +4,11 @@
 # Configuration
 ################################################################################
 
+# Set the path to the root of the git repository
+ROOT="$(git rev-parse --show-toplevel)"
+
 # Set the path to the directory containing the CSV files
-CSV_DIR="./front/csv"
+CSV_DIR="${ROOT}/front/csv"
 
 ################################################################################
 # Main
