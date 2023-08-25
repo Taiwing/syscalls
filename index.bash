@@ -75,8 +75,8 @@ print_syscalls() {
 		<p>
 			Other syscalls might be lacking some information about their
 			parameters. This is because the syscall declaration was not explicit
-			enough. For example, the <code>oldolduname</code> syscall for the
-			i386 architecture is declared as follows:
+			enough. For example, the <code>oldolduname</code> syscall entry
+			point for the i386 architecture is declared as follows:
 			<code>int sys_olduname(struct oldold_utsname *);</code>
 			As you can see, the parameter is not named. This is not a problem
 			for the kernel, but it is for the parsing script. In this case, the
