@@ -25,41 +25,35 @@ OUTPUT_DIR="./front/src/arch"
 mkdir -p "$OUTPUT_DIR"
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.html"
 
+# include the template functions
+source ./template.bash
+
 ################################################################################
 # Create the output files
 ################################################################################
 
 # create the output file
-echo -n "" > "$OUTPUT_FILE"
+print_head "$ARCH_ABI" "../style" "yes" > "$OUTPUT_FILE"
 cat << EOF >> "$OUTPUT_FILE"
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>syscall table ${ARCH_ABI}</title>
-		<link rel="stylesheet" href="../style/arch.css">
-		<link rel="stylesheet" href="../style/global.css">
-	</head>
-	<body>
-		<h1>syscall table ${ARCH_ABI}</h1>
-		<a href="../csv/${ARCH_ABI}.csv" download>Download as a CSV</a>
-		<table>
-			<thead>
-				<tr>
-					<th>NR</th>
-					<th>Name</th>
-					<th>Status</th>
-					<th>Return type</th>
-					<th>Parameters count</th>
-					<th>Parameter 1</th>
-					<th>Parameter 2</th>
-					<th>Parameter 3</th>
-					<th>Parameter 4</th>
-					<th>Parameter 5</th>
-					<th>Parameter 6</th>
-				</tr>
-			</thead>
-			<tbody>
+		<main>
+			<a href="../csv/${ARCH_ABI}.csv" download>Download as a CSV</a>
+			<table>
+				<thead>
+					<tr>
+						<th>NR</th>
+						<th>Name</th>
+						<th>Status</th>
+						<th>Return type</th>
+						<th>Parameters count</th>
+						<th>Parameter 1</th>
+						<th>Parameter 2</th>
+						<th>Parameter 3</th>
+						<th>Parameter 4</th>
+						<th>Parameter 5</th>
+						<th>Parameter 6</th>
+					</tr>
+				</thead>
+				<tbody>
 EOF
 
 ################################################################################
@@ -94,19 +88,21 @@ while read LINE; do
 	[ $NR -gt $MAX_NR ] && MAX_NR=$NR
 
 	# write the syscall information
-	echo "				<tr>" >> "$OUTPUT_FILE"
-	echo "					<td>$NR</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$NAME</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$STATUS</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$RETURN_TYPE</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAMS_COUNT</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM1</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM2</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM3</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM4</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM5</td>" >> "$OUTPUT_FILE"
-	echo "					<td>$PARAM6</td>" >> "$OUTPUT_FILE"
-	echo "				</tr>" >> "$OUTPUT_FILE"
+	cat <<EOF >> "$OUTPUT_FILE"
+					<tr>
+						<td>$NR</td>
+						<td>$NAME</td>
+						<td>$STATUS</td>
+						<td>$RETURN_TYPE</td>
+						<td>$PARAMS_COUNT</td>
+						<td>$PARAM1</td>
+						<td>$PARAM2</td>
+						<td>$PARAM3</td>
+						<td>$PARAM4</td>
+						<td>$PARAM5</td>
+						<td>$PARAM6</td>
+					</tr>
+EOF
 
 done < "$CSV_FILE"
 
@@ -114,10 +110,10 @@ done < "$CSV_FILE"
 # Finish the output file
 ################################################################################
 
-# finish the output file
-cat << EOF >> "$OUTPUT_FILE"
-			</tbody>
-		</table>
-	</body>
-</html>
+cat <<EOF >> "$OUTPUT_FILE"
+				</tbody>
+			</table>
+		</main>
 EOF
+
+print_tail >> "$OUTPUT_FILE"
