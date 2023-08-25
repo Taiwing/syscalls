@@ -54,7 +54,6 @@ fi
 
 # output file
 OUTPUT_DIR="../front/csv"
-mkdir -p $OUTPUT_DIR
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.csv"
 echo -n "nr,name,status,return_type,param_count," > $OUTPUT_FILE
 echo "param1,param2,param3,param4,param5,param6" >> $OUTPUT_FILE

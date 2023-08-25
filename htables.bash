@@ -22,7 +22,6 @@ ARCH_ABI="$(basename "$CSV_FILE")"
 ARCH_ABI="${ARCH_ABI%.*}"
 # output file
 OUTPUT_DIR="./front/src/arch"
-mkdir -p "$OUTPUT_DIR"
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.html"
 
 # include the template functions
