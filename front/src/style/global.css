@@ -1,6 +1,7 @@
 :root {
 	--black: #000;
 	--white: #fff;
+	--gray: #ccc;
 
 	--text-color: var(--black);
 	--background-color: var(--white);

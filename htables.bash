@@ -36,7 +36,9 @@ source ./template.bash
 print_head "$ARCH_ABI" "../style" "yes" > "$OUTPUT_FILE"
 cat << EOF >> "$OUTPUT_FILE"
 		<main>
-			<a href="../csv/${ARCH_ABI}.csv" download>Download as a CSV</a>
+			<p>
+				<a href="../csv/${ARCH_ABI}.csv" download>Download as a CSV</a>
+			</p>
 			<table>
 				<thead>
 					<tr>

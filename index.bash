@@ -62,9 +62,11 @@ print_main() {
 				<a href="https://github.com/Taiwing/syscalls">github</a>
 				repository.
 			</p>
-			<a href="csv/syscalls.tar.gz" download>
-				Download all syscalls as CSV
-			</a>
+			<p>
+				<a href="csv/syscalls.tar.gz" download>
+					Download all syscalls as CSV
+				</a>
+			</p>
 			<ul>
 EOF
     for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR}); do
