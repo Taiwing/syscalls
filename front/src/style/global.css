@@ -1,12 +1,13 @@
 :root {
-	--black: #000;
-	--white: #fff;
-	--light-gray: #ddd;
-	--dark-gray: #999;
-	--very-light-gray: #f2f2f2;
+	--black: #000000;
+	--base: #765827;
+	--dark-base: #65451F;
+
+	--back: #EAC696;
+	--dark-back: #C8AE7D;
 
 	--text-color: var(--black);
-	--background-color: var(--white);
+	--background-color: var(--back);
 }
 
 html {
@@ -32,6 +33,8 @@ header {
 	padding: 0 0.75rem;
 	flex-grow: 0;
 	flex-shrink: 0;
+	color: var(--background-color);
+	background: var(--dark-base);
 }
 
 main {
@@ -56,15 +59,19 @@ footer {
 	flex-grow: 0;
 	flex-shrink: 0;
 	justify-content: space-around;
+	color: var(--background-color);
+	background: var(--dark-base);
+}
+
+a {
+	color: inherit;
 }
 
 header a {
-	color: inherit;
 	text-decoration: none;
 }
 
 footer a {
-	color: inherit;
 	text-decoration: none;
 }
 

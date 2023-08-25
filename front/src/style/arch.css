@@ -5,7 +5,7 @@ th:nth-child(3), th:nth-child(4), th:nth-child(5) {
 
 table {
 	border-spacing: 0;
-	border: 1px solid var(--light-gray);
+	border: 1px solid var(--dark-back);
 }
 
 th, td {
@@ -17,10 +17,10 @@ td:nth-child(1) {
 }
 
 tr:nth-child(even) {
-	background-color: var(--very-light-gray);
+	background-color: var(--dark-back);
 }
 
 th {
-	background-color: var(--dark-gray);
+	background-color: var(--dark-base);
 	color: var(--background-color);
 }
