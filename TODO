@@ -1,5 +1,14 @@
 --- TODO ---
 
+front:
+	- separate the generic tables from the rest and explain what they are
+	- Maybe add special cases for some architectures, like "powerpc_nospu_32"
+	  and "powerpc_nospu_64" which should just be named "powerpc_<32|64>", or
+	  "x86_i386" which should really be either "i386" or "x86_32" and "x86_x32"
+	  which should just be "x32". The smart thing should be to add the
+	  architecture name and the eventual ABIs as separate infos so that the
+	  pages can be listed together when need be.
+
 find_syscalls:
 	- continue remaking the find_syscalls script into python
 
