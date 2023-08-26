@@ -2,6 +2,11 @@
 
 front:
 	- separate the generic tables from the rest and explain what they are
+	- add a paragraph about how the source files are preprocessed, basically
+	  that as many syscalls are added as possible with the
+	  '__ARCH_WANT_<some syscall>' macros and that in case of multiple
+	  definitions the default one is chosen, adding that this configuration is
+	  not meant to be realistic but to not miss any syscall
 	- Maybe add special cases for some architectures, like "powerpc_nospu_32"
 	  and "powerpc_nospu_64" which should just be named "powerpc_<32|64>", or
 	  "x86_i386" which should really be either "i386" or "x86_32" and "x86_x32"
