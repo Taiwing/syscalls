@@ -14,7 +14,7 @@
 				<a id="app-name" href="/">Syscalls</a>
 				- generic_64
 			</p>
-			<p>Last update: Sat, 26 Aug 2023 11:53:59 +0200</p>
+			<p>Last update: Sat, 26 Aug 2023 13:08:51 +0200</p>
 		</header>
 		<main>
 			<p>
@@ -529,6 +529,19 @@
 						<td>int newdfd</td>
 						<td>const char * newname</td>
 						<td>int flags</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>38</td>
+						<td>renameat</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int olddfd</td>
+						<td>const char * oldname</td>
+						<td>int newdfd</td>
+						<td>const char * newname</td>
+						<td>-</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -2138,6 +2151,32 @@
 						<td>2</td>
 						<td>char * name</td>
 						<td>int len</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>163</td>
+						<td>getrlimit</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>unsigned int resource</td>
+						<td>struct rlimit * rlim</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>164</td>
+						<td>setrlimit</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>unsigned int resource</td>
+						<td>struct rlimit * rlim</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -3769,6 +3808,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>435</td>
+						<td>clone3</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>struct clone_args * uargs</td>
+						<td>size_t size</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>436</td>
 						<td>close_range</td>
 						<td>ok</td>
@@ -3906,6 +3958,19 @@
 						<td>2</td>
 						<td>const int ruleset_fd</td>
 						<td>const __u32 flags</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>447</td>
+						<td>memfd_secret</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>1</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>

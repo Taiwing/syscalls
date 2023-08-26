@@ -14,7 +14,7 @@
 				<a id="app-name" href="/">Syscalls</a>
 				- generic_32
 			</p>
-			<p>Last update: Sat, 26 Aug 2023 11:53:59 +0200</p>
+			<p>Last update: Sat, 26 Aug 2023 13:08:51 +0200</p>
 		</header>
 		<main>
 			<p>
@@ -87,6 +87,19 @@
 						<td>struct io_event * result</td>
 						<td>-</td>
 						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>io_getevents</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>5</td>
+						<td>aio_context_t ctx_id</td>
+						<td>long min_nr</td>
+						<td>long nr</td>
+						<td>struct io_event * events</td>
+						<td>struct __kernel_timespec * timeout</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -519,6 +532,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>38</td>
+						<td>renameat</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int olddfd</td>
+						<td>const char * oldname</td>
+						<td>int newdfd</td>
+						<td>const char * newname</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>39</td>
 						<td>umount2</td>
 						<td>ok</td>
@@ -948,6 +974,32 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>72</td>
+						<td>pselect6</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>6</td>
+						<td>int n</td>
+						<td>fd_set * inp</td>
+						<td>fd_set * outp</td>
+						<td>fd_set * exp</td>
+						<td>struct __kernel_timespec * tsp</td>
+						<td>void * sig</td>
+					</tr>
+					<tr>
+						<td>73</td>
+						<td>ppoll</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>5</td>
+						<td>struct pollfd * ufds</td>
+						<td>unsigned int nfds</td>
+						<td>struct __kernel_timespec * tsp</td>
+						<td>const sigset_t * sigmask</td>
+						<td>size_t sigsetsize</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>74</td>
 						<td>signalfd4</td>
 						<td>ok</td>
@@ -1104,6 +1156,45 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>86</td>
+						<td>timerfd_settime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int ufd</td>
+						<td>int flags</td>
+						<td>const struct __kernel_itimerspec * utmr</td>
+						<td>struct __kernel_itimerspec * otmr</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>87</td>
+						<td>timerfd_gettime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>int ufd</td>
+						<td>struct __kernel_itimerspec * otmr</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>88</td>
+						<td>utimensat</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int dfd</td>
+						<td>const char * filename</td>
+						<td>struct __kernel_timespec * utimes</td>
+						<td>int flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>89</td>
 						<td>acct</td>
 						<td>ok</td>
@@ -1221,6 +1312,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>98</td>
+						<td>futex</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>6</td>
+						<td>u32 * uaddr</td>
+						<td>int op</td>
+						<td>u32 val</td>
+						<td>const struct __kernel_timespec * utime</td>
+						<td>u32 * uaddr2</td>
+						<td>u32 val3</td>
+					</tr>
+					<tr>
 						<td>99</td>
 						<td>set_robust_list</td>
 						<td>ok</td>
@@ -1242,6 +1346,19 @@
 						<td>int pid</td>
 						<td>struct robust_list_head * * head_ptr</td>
 						<td>size_t * len_ptr</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>101</td>
+						<td>nanosleep</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>struct __kernel_timespec * rqtp</td>
+						<td>struct __kernel_timespec * rmtp</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -1325,6 +1442,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>108</td>
+						<td>timer_gettime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>timer_t timer_id</td>
+						<td>struct __kernel_itimerspec * setting</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>109</td>
 						<td>timer_getoverrun</td>
 						<td>ok</td>
@@ -1338,6 +1468,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>110</td>
+						<td>timer_settime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>timer_t timer_id</td>
+						<td>int flags</td>
+						<td>const struct __kernel_itimerspec * new_setting</td>
+						<td>struct __kernel_itimerspec * old_setting</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>111</td>
 						<td>timer_delete</td>
 						<td>ok</td>
@@ -1347,6 +1490,58 @@
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>112</td>
+						<td>clock_settime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>const clockid_t which_clock</td>
+						<td>const struct __kernel_timespec * tp</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>113</td>
+						<td>clock_gettime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>const clockid_t which_clock</td>
+						<td>struct __kernel_timespec * tp</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>114</td>
+						<td>clock_getres</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>const clockid_t which_clock</td>
+						<td>struct __kernel_timespec * tp</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>115</td>
+						<td>clock_nanosleep</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>const clockid_t which_clock</td>
+						<td>int flags</td>
+						<td>const struct __kernel_timespec * rqtp</td>
+						<td>struct __kernel_timespec * rmtp</td>
 						<td>-</td>
 						<td>-</td>
 					</tr>
@@ -1494,6 +1689,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>127</td>
+						<td>sched_rr_get_interval</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>pid_t pid</td>
+						<td>struct __kernel_timespec * interval</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>128</td>
 						<td>restart_syscall</td>
 						<td>ok</td>
@@ -1607,6 +1815,19 @@
 						<td>size_t sigsetsize</td>
 						<td>-</td>
 						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>137</td>
+						<td>rt_sigtimedwait</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>const sigset_t * uthese</td>
+						<td>siginfo_t * uinfo</td>
+						<td>const struct __kernel_timespec * uts</td>
+						<td>size_t sigsetsize</td>
 						<td>-</td>
 						<td>-</td>
 					</tr>
@@ -1936,6 +2157,32 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>163</td>
+						<td>getrlimit</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>unsigned int resource</td>
+						<td>struct rlimit * rlim</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>164</td>
+						<td>setrlimit</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>unsigned int resource</td>
+						<td>struct rlimit * rlim</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>165</td>
 						<td>getrusage</td>
 						<td>ok</td>
@@ -1983,6 +2230,45 @@
 						<td>unsigned * cpup</td>
 						<td>unsigned * nodep</td>
 						<td>struct getcpu_cache * unused</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>169</td>
+						<td>gettimeofday</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>struct __kernel_old_timeval * tv</td>
+						<td>struct timezone * tz</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>170</td>
+						<td>settimeofday</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>struct __kernel_old_timeval * tv</td>
+						<td>struct timezone * tz</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>171</td>
+						<td>adjtimex</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>1</td>
+						<td>struct __kernel_timex * txc_p</td>
+						<td>-</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -2118,6 +2404,32 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>182</td>
+						<td>mq_timedsend</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>5</td>
+						<td>mqd_t mqdes</td>
+						<td>const char * u_msg_ptr</td>
+						<td>size_t msg_len</td>
+						<td>unsigned int msg_prio</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>183</td>
+						<td>mq_timedreceive</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>5</td>
+						<td>mqd_t mqdes</td>
+						<td>char * u_msg_ptr</td>
+						<td>size_t msg_len</td>
+						<td>unsigned int * u_msg_prio</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>184</td>
 						<td>mq_notify</td>
 						<td>ok</td>
@@ -2218,6 +2530,19 @@
 						<td>int semnum</td>
 						<td>int cmd</td>
 						<td>unsigned long arg</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>192</td>
+						<td>semtimedop</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int semid</td>
+						<td>struct sembuf * tsops</td>
+						<td>unsigned int nsops</td>
+						<td>const struct __kernel_timespec * timeout</td>
 						<td>-</td>
 						<td>-</td>
 					</tr>
@@ -2872,6 +3197,32 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>243</td>
+						<td>recvmmsg</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>5</td>
+						<td>int fd</td>
+						<td>struct mmsghdr * mmsg</td>
+						<td>unsigned int vlen</td>
+						<td>unsigned int flags</td>
+						<td>struct __kernel_timespec * timeout</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>260</td>
+						<td>wait4</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>pid_t upid</td>
+						<td>int * stat_addr</td>
+						<td>int options</td>
+						<td>struct rusage * ru</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>261</td>
 						<td>prlimit64</td>
 						<td>ok</td>
@@ -2932,6 +3283,19 @@
 						<td>int mountdirfd</td>
 						<td>struct file_handle * handle</td>
 						<td>int flags</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>266</td>
+						<td>clock_adjtime</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>const clockid_t which_clock</td>
+						<td>struct __kernel_timex * utx</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -3260,6 +3624,19 @@
 						<td>unsigned int mask</td>
 						<td>struct statx * buffer</td>
 						<td>-</td>
+					</tr>
+					<tr>
+						<td>292</td>
+						<td>io_pgetevents</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>6</td>
+						<td>aio_context_t ctx_id</td>
+						<td>long min_nr</td>
+						<td>long nr</td>
+						<td>struct io_event * events</td>
+						<td>struct __kernel_timespec * timeout</td>
+						<td>const struct __aio_sigset * usig</td>
 					</tr>
 					<tr>
 						<td>293</td>
@@ -3691,6 +4068,19 @@
 						<td>-</td>
 					</tr>
 					<tr>
+						<td>435</td>
+						<td>clone3</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>2</td>
+						<td>struct clone_args * uargs</td>
+						<td>size_t size</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
 						<td>436</td>
 						<td>close_range</td>
 						<td>ok</td>
@@ -3828,6 +4218,19 @@
 						<td>2</td>
 						<td>const int ruleset_fd</td>
 						<td>const __u32 flags</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>447</td>
+						<td>memfd_secret</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>1</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>

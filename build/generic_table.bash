@@ -49,11 +49,18 @@ remove_includes() {
 preprocess() {
 	local SRC="$1"
 	local ARCH="$2"
-	#local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__SYSCALL=__SYSCALL_${ARCH}"
-	local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__ARCH_WANT_NEW_STAT"
 	local TMP_DEFS="tmp_${ARCH_ABI}_defs.h"
 	local TMP_SRC="tmp_${ARCH_ABI}_src.h"
 	local TMP_SRC2="tmp_${ARCH_ABI}_src2.h"
+	# add defines to get as many syscalls as possible
+	local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH}"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_MEMFD_SECRET"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_NEW_STAT"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_RENAMEAT"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_SET_GET_RLIMIT"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_STAT64"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_SYS_CLONE3"
+	GCC_OPTIONS="$GCC_OPTIONS -D__ARCH_WANT_TIME32_SYSCALLS"
 
 	cat <<EOF > "${TMP_DEFS}"
 #define __SYSCALL(x, y)						row: x ${ARCH} #x y
