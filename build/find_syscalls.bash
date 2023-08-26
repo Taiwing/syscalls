@@ -355,11 +355,12 @@ function preprocess_source_file {
 #################### FIND SYSCALL DECLARATIONS ####################
 
 # prototype paths in priority order
-VALID_PROTOTYPE_PATHS=(\
-	"arch/$ARCH_NAME/"
-	"include/asm-generic/"
-	"include/linux/"
-)
+VALID_PROTOTYPE_PATHS=()
+if [ "$ARCH_NAME" != "generic" ]; then
+	VALID_PROTOTYPE_PATHS+=("arch/$ARCH_NAME/")
+fi
+VALID_PROTOTYPE_PATHS+=("include/asm-generic/")
+VALID_PROTOTYPE_PATHS+=("include/linux/")
 
 # find the syscall by function prototype in the source files
 function find_matching_file_by_prototype {
@@ -413,7 +414,11 @@ RAW_DEFINE_PATHS=$(\
 	| tr -d './' \
 	| sort
 )
-VALID_DEFINE_PATHS=("arch/$ARCH_NAME") # in priority order
+
+VALID_DEFINE_PATHS=()
+if [ "$ARCH_NAME" != "generic" ]; then
+	VALID_DEFINE_PATHS+=("arch/$ARCH_NAME") # in priority order
+fi
 for DIRECTORY in $RAW_DEFINE_PATHS; do
 	if rg -q --glob '*.c' "\bSYSCALL_DEFINE.\(\w+\b" $DIRECTORY; then
 		VALID_DEFINE_PATHS+=($DIRECTORY)

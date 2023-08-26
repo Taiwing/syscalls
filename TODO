@@ -1,7 +1,6 @@
 --- TODO ---
 
 find_syscalls:
-	- generate the csv file for the generic interface too (super important!!!)
 	- continue remaking the find_syscalls script into python
 
 repo:

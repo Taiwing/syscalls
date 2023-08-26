@@ -17,15 +17,21 @@ ABI_NAME_ARG_OLD=""
 LINUX_PATH="${ROOT}/linux"
 
 # path to the syscall tables
-TABLE_FILES=$(find ${LINUX_PATH}/arch -type f -name 'syscall*.tbl')
+# generic tables
+TABLE_FILES="$(find ${LINUX_PATH} -maxdepth 1 -type f -name '*.tbl')"
+# architecture specific tables
+TABLE_FILES="$TABLE_FILES $(\
+	find ${LINUX_PATH}/arch -type f -name 'syscall*.tbl'
+)"
 
 # read the syscall tables
 for TABLE_FILE in ${TABLE_FILES}; do
 	# remove linux path
 	ARCH_FILE=${TABLE_FILE:${#LINUX_PATH}+1}
 
-	# extract the architecture and the table name
-	[[ $TABLE_FILE =~ arch/([^/]*)/.*syscall_*(.*)\.tbl ]]
+	# extract the architecture
+	[[ $TABLE_FILE =~ arch/([^/]+)/.*syscall.*\.tbl ]] || \
+	[[ $TABLE_FILE =~ (generic)_(32|64)\.tbl ]]
 	ARCH_NAME="${BASH_REMATCH[1]}"
 
 	# if the architecture is specified, skip all others

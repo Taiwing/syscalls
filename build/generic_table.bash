@@ -20,16 +20,14 @@ ARCH_NAME="generic"
 ABI_NAME="${1:-64}"
 # architecture and abi combined
 ARCH_ABI="${ARCH_NAME}_${ABI_NAME}"
-# path to the output directory
-OUTPUT_DIR=".."
 # path to the output file
-OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_NAME}_${ABI_NAME}.tbl"
+OUTPUT_FILE="${ARCH_NAME}_${ABI_NAME}.tbl"
 
 # path to the generic table source file
 TABLE_SOURCE="include/uapi/asm-generic/unistd.h"
 FLAT_PATH_FILE="$(echo $TABLE_SOURCE | tr '/' '_')"
-NO_INCLUDE_FILE="${OUTPUT_DIR}/tmp_${ARCH_ABI}_no_include_${FLAT_PATH_FILE}"
-PREPROCESSED_FILE="${OUTPUT_DIR}/tmp_${ARCH_ABI}_preprocessed_${FLAT_PATH_FILE}"
+NO_INCLUDE_FILE="tmp_${ARCH_ABI}_no_include_${FLAT_PATH_FILE}"
+PREPROCESSED_FILE="tmp_${ARCH_ABI}_preprocessed_${FLAT_PATH_FILE}"
 
 ################################################################################
 # Functions
@@ -37,7 +35,7 @@ PREPROCESSED_FILE="${OUTPUT_DIR}/tmp_${ARCH_ABI}_preprocessed_${FLAT_PATH_FILE}"
 
 # clean up the output directory
 function cleanup {
-	rm -f ${OUTPUT_DIR}/tmp_${ARCH_ABI}_*
+	rm -f tmp_${ARCH_ABI}_*
 }
 
 # remove include statements
@@ -53,9 +51,9 @@ preprocess() {
 	local ARCH="$2"
 	#local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__SYSCALL=__SYSCALL_${ARCH}"
 	local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__ARCH_WANT_NEW_STAT"
-	local TMP_DEFS="${OUTPUT_DIR}/tmp_${ARCH_ABI}_defs.h"
-	local TMP_SRC="${OUTPUT_DIR}/tmp_${ARCH_ABI}_src.h"
-	local TMP_SRC2="${OUTPUT_DIR}/tmp_${ARCH_ABI}_src2.h"
+	local TMP_DEFS="tmp_${ARCH_ABI}_defs.h"
+	local TMP_SRC="tmp_${ARCH_ABI}_src.h"
+	local TMP_SRC2="tmp_${ARCH_ABI}_src2.h"
 
 	cat <<EOF > "${TMP_DEFS}"
 #define __SYSCALL(x, y)						row: x ${ARCH} #x y
