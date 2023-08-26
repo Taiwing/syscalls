@@ -35,6 +35,11 @@ PREPROCESSED_FILE="${OUTPUT_DIR}/tmp_${ARCH_ABI}_preprocessed_${FLAT_PATH_FILE}"
 # Functions
 ################################################################################
 
+# clean up the output directory
+function cleanup {
+	rm -f ${OUTPUT_DIR}/tmp_${ARCH_ABI}_*
+}
+
 # remove include statements
 remove_includes() {
 	local SOURCE_FILE="$1"
@@ -48,9 +53,9 @@ preprocess() {
 	local ARCH="$2"
 	#local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__SYSCALL=__SYSCALL_${ARCH}"
 	local GCC_OPTIONS="-D__BITS_PER_LONG=${ARCH} -D__ARCH_WANT_NEW_STAT"
-	local TMP_DEFS="${OUTPUT_DIR}/tmp_defs_${ARCH_ABI}.h"
-	local TMP_SRC="${OUTPUT_DIR}/tmp_src_${ARCH_ABI}.h"
-	local TMP_SRC2="${OUTPUT_DIR}/tmp_src2_${ARCH_ABI}.h"
+	local TMP_DEFS="${OUTPUT_DIR}/tmp_${ARCH_ABI}_defs.h"
+	local TMP_SRC="${OUTPUT_DIR}/tmp_${ARCH_ABI}_src.h"
+	local TMP_SRC2="${OUTPUT_DIR}/tmp_${ARCH_ABI}_src2.h"
 
 	cat <<EOF > "${TMP_DEFS}"
 #define __SYSCALL(x, y)						row: x ${ARCH} #x y
@@ -70,17 +75,43 @@ EOF
 	gcc -E $GCC_OPTIONS "$TMP_SRC2"
 }
 
+create_table() {
+	local SRC="$1"
+	declare -A ALIAS
+
+	# load alias map
+	while read -r LINE; do
+		ARR=($(eval echo $LINE))
+		ALIAS[${ARR[0]}]="${ARR[1]}"
+	done < <(grep '^alias:' "$SRC" | sed -e 's/^alias: //')
+
+	# create row file
+	while read -r LINE; do
+		ARR=($(eval echo $LINE))
+		NAME="${ARR[2]}"
+		NAME="${ALIAS[$NAME]:-$NAME}"
+		NAME="${NAME//__NR_/}"
+		echo "${ARR[0]} ${ARR[1]} ${NAME} ${ARR[3]}"
+	done < <(grep '^row:' "$SRC" | sed -e 's/^row: //')
+}
+
 ################################################################################
 # Main
 ################################################################################
 
 main() {
+	# setup cleanup function
+	trap cleanup EXIT
+
 	# remove include statements
 	remove_includes "$TABLE_SOURCE" > "$NO_INCLUDE_FILE"
 
 	# preprocess the file according to the architecture
 	preprocess "$NO_INCLUDE_FILE" "$ABI_NAME" \
 		| grep -v -e '^#' -e '^$' > "$PREPROCESSED_FILE"
+
+	# create table file
+	create_table "$PREPROCESSED_FILE" > "$OUTPUT_FILE"
 }
 
 main
