@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # This script is used to generate a table file for the linux generic
 # architecures.

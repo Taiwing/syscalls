@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # This script will find all the syscall definitions in the kernel source code
 # for a given architecture and ABI. It returns a CSV file with the following

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # This script is used to generate the index.html file for the website. It links
 # to all the syscalls pages.

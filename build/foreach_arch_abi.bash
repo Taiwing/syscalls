@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # This script iterates over all syscall tables in the linux kernel source code
 # and calls find_syscalls.bash for each architecture and ABI pair possible.

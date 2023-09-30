@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # This script is used to create an HTML table from a CSV file.
 # The csv file must have the following format:
