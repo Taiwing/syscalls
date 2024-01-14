@@ -37,8 +37,4 @@ repo:
 	  (the rest should be moved the the front/ directory since it should be
 	  front-specific).
 	- gather every part into one script to rule them all
-	- automate the process of updating the kernel submodule, finding the new
-	  syscalls if any (so re-generating the csv files), re-creating the front
-	  and rebuilding/restarting the docker compose (maybe even automate some git
-	  actions), then add a cronjob on the host machine
 	- expand README.md file explanations
