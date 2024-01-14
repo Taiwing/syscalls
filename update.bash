@@ -13,11 +13,12 @@ git pull --recurse-submodules
 # update all submodules to the latest version
 git submodule update --remote --recursive
 
-# rebuild the application
+# rebuild the front files
 make -C build/ re
+make -C build/ clean
 
 # commit the new application build
 git commit -am "build: update syscalls list"
 
-# rebuild the application
+# rebuild the running application
 docker compose up -d --build --force-recreate
