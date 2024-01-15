@@ -14,7 +14,7 @@
 				<a id="app-name" href="/">Syscalls</a>
 				- powerpc_nospu_32
 			</p>
-			<p>Last update: Sat, 26 Aug 2023 13:08:51 +0200</p>
+			<p>Last update: Mon, 15 Jan 2024 08:02:49 +0000</p>
 		</header>
 		<main>
 			<p>
@@ -3082,12 +3082,12 @@
 					<tr>
 						<td>235</td>
 						<td>lookup_dcookie</td>
-						<td>ok</td>
-						<td>long</td>
-						<td>3</td>
-						<td>u64 cookie64</td>
-						<td>char * buf</td>
-						<td>size_t len</td>
+						<td>todo</td>
+						<td></td>
+						<td></td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -5653,13 +5653,143 @@
 						<td>-</td>
 						<td>-</td>
 					</tr>
+					<tr>
+						<td>452</td>
+						<td>fchmodat2</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>int dfd</td>
+						<td>const char * filename</td>
+						<td>umode_t mode</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>453</td>
+						<td>map_shadow_stack</td>
+						<td>todo</td>
+						<td></td>
+						<td></td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>454</td>
+						<td>futex_wake</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>void * uaddr</td>
+						<td>unsigned long mask</td>
+						<td>int nr</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>455</td>
+						<td>futex_wait</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>6</td>
+						<td>void * uaddr</td>
+						<td>unsigned long val</td>
+						<td>unsigned long mask</td>
+						<td>unsigned int flags</td>
+						<td>struct __kernel_timespec * timeout</td>
+						<td>clockid_t clockid</td>
+					</tr>
+					<tr>
+						<td>456</td>
+						<td>futex_requeue</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>struct futex_waitv * waiters</td>
+						<td>unsigned int flags</td>
+						<td>int nr_wake</td>
+						<td>int nr_requeue</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>457</td>
+						<td>statmount</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>const struct mnt_id_req * req</td>
+						<td>struct statmount * buf</td>
+						<td>size_t bufsize</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>458</td>
+						<td>listmount</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>const struct mnt_id_req * req</td>
+						<td>u64 * buf</td>
+						<td>size_t bufsize</td>
+						<td>unsigned int flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>459</td>
+						<td>lsm_get_self_attr</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>unsigned int attr</td>
+						<td>struct lsm_ctx * ctx</td>
+						<td>size_t * size</td>
+						<td>u32 flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>460</td>
+						<td>lsm_set_self_attr</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>4</td>
+						<td>unsigned int attr</td>
+						<td>struct lsm_ctx * ctx</td>
+						<td>size_t size</td>
+						<td>u32 flags</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>461</td>
+						<td>lsm_list_modules</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>3</td>
+						<td>u64 * ids</td>
+						<td>size_t * size</td>
+						<td>u32 flags</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
 				</tbody>
 			</table>
 		</main>
 		<footer>
 			<p class="footer-text">
 				©
-				<span id="years">2023</span>
+				<span id="years">2023-2024</span>
 				<span id="author">Yoann Foreau</span>
 				--
 				<a id="license" href="https://www.gnu.org/licenses/gpl-3.0.html#license-text">GNU General Public License v3</a>
