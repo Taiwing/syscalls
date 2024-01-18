@@ -24,3 +24,11 @@ th {
 	background-color: var(--dark-base);
 	color: var(--background-color);
 }
+
+@media only screen and (max-width: 1600px) {
+	table {
+		width: 100%;
+		display: block;
+		overflow-x: auto;
+	}
+}
