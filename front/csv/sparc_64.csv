@@ -388,7 +388,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 455,futex_wait,ok,long,6,void * uaddr,unsigned long val,unsigned long mask,unsigned int flags,struct __kernel_timespec * timeout,clockid_t clockid
 456,futex_requeue,ok,long,4,struct futex_waitv * waiters,unsigned int flags,int nr_wake,int nr_requeue,,
 457,statmount,ok,long,4,const struct mnt_id_req * req,struct statmount * buf,size_t bufsize,unsigned int flags,,
-458,listmount,ok,long,4,const struct mnt_id_req * req,u64 * buf,size_t bufsize,unsigned int flags,,
+458,listmount,ok,long,4,const struct mnt_id_req * req,u64 * mnt_ids,size_t nr_mnt_ids,unsigned int flags,,
 459,lsm_get_self_attr,ok,long,4,unsigned int attr,struct lsm_ctx * ctx,size_t * size,u32 flags,,
 460,lsm_set_self_attr,ok,long,4,unsigned int attr,struct lsm_ctx * ctx,size_t size,u32 flags,,
 461,lsm_list_modules,ok,long,3,u64 * ids,size_t * size,u32 flags,,,
