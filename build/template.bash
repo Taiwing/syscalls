@@ -60,11 +60,13 @@ print_tail() {
     cat <<EOF
 		<footer>
 			<p class="footer-text">
-				©
-				<span id="years">$(copyright_years)</span>
+				<span id="copyright">
+					©
+					$(copyright_years)
+				</span>
 				<span id="author">${WEBSITE_AUTHOR}</span>
-				--
 				<a id="license" href="${LICENSE_URL}">
+					--
 					<span class="desktop">${LICENSE_DESKTOP}</span>
 					<span class="mobile">${LICENSE_MOBILE}</span>
 				</a>

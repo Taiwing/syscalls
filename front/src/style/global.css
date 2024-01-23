@@ -80,6 +80,8 @@ footer a {
 	display: flex;
 	flex-direction: row;
 	gap: 0.25rem;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 .mobile {
@@ -90,7 +92,7 @@ footer a {
 	display: initial;
 }
 
-@media only screen and (max-width: 1600px) {
+@media only screen and (max-width: 1599px) {
 	body {
 		display: block;
 		overflow: scroll;
@@ -116,6 +118,12 @@ footer a {
 	}
 
 	.desktop {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 419px) {
+	#license {
 		display: none;
 	}
 }
