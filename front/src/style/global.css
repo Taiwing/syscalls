@@ -82,6 +82,14 @@ footer a {
 	gap: 0.25rem;
 }
 
+.mobile {
+	display: none;
+}
+
+.desktop {
+	display: initial;
+}
+
 @media only screen and (max-width: 1600px) {
 	body {
 		display: block;
@@ -101,5 +109,13 @@ footer a {
 
 	footer {
 		padding: 1rem 0.75rem;
+	}
+
+	.mobile {
+		display: initial;
+	}
+
+	.desktop {
+		display: none;
 	}
 }

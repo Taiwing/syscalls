@@ -5,7 +5,8 @@
 # constants
 WEBSITE_NAME="Syscalls"
 WEBSITE_AUTHOR="Yoann Foreau"
-LICENSE='GNU General Public License v3'
+LICENSE_DESKTOP='GNU General Public License v3'
+LICENSE_MOBILE='GPLv3'
 LICENSE_URL='https://www.gnu.org/licenses/gpl-3.0.html#license-text'
 START_YEAR='2023'
 CURRENT_YEAR="$(date +%Y)"
@@ -63,7 +64,10 @@ print_tail() {
 				<span id="years">$(copyright_years)</span>
 				<span id="author">${WEBSITE_AUTHOR}</span>
 				--
-				<a id="license" href="${LICENSE_URL}">${LICENSE}</a>
+				<a id="license" href="${LICENSE_URL}">
+					<span class="desktop">${LICENSE_DESKTOP}</span>
+					<span class="mobile">${LICENSE_MOBILE}</span>
+				</a>
 			</p>
 		</footer>
 	</body>
