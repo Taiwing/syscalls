@@ -64,11 +64,11 @@ Add this line to your crontab to run it once a week:
 0 7 * * 1 path/of/this/repo/update.bash
 ```
 
-> If you have issues when running the script with cron (like empty lists), this
-> is probably because the ripgrep command is missing. Either because it is not
-> installed or because it is not on the PATH. If you have a specific bash
-> configuration that is not taken into account by the cron job you might need
-> to add the following lines to your crontab:
->
-> SHELL=path/of/your/bash/executable
-> BASH\_ENV=path/of/your/bash/config
+If you have issues when running the script with cron (like empty lists), this is
+probably because the ripgrep command is missing. Either because it is not
+installed or because it is not on the PATH. If you have a specific bash
+configuration that is not taken into account by the cron job you might need to
+add the following lines to your crontab:
+
+SHELL=path/of/your/bash/executable
+BASH\_ENV=path/of/your/bash/config
