@@ -19,20 +19,12 @@ front:
 	  files anyway), and max syscall NR. And maybe a specific little paragraph
 	  about the architecture if need be (maybe not, this is too much
 	  customization I think).
+	- Make the overall home page clearer. Add a little informative section about
+	  what are the kernel and syscalls, as well as why this application was
+	  necessary.
 
 find_syscalls:
 	- continue remaking the find_syscalls script into python
 
 repo:
-	- Maybe add an API this would be cool. Create an api directory, add the app
-	  to the - then really useful - compose file, and move csv/ directory out of
-	  the front (COPY it in the Dockerfile probably), probably create an other
-	  Makefile for the api (or not, maybe read the csv files directly at api
-	  start and dynamically create the routes). Add a swagger doc or something
-	  so that people know how to use it. Anyway, probably create a main Makefile
-	  at the root of the repository to build the front and the api. See what is
-	  common to the both of them and maybe get it out of the build/ directory
-	  (the rest should be moved the the front/ directory since it should be
-	  front-specific).
 	- gather every part into one script to rule them all
-	- expand README.md file explanations
