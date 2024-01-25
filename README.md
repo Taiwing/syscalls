@@ -70,5 +70,7 @@ installed or because it is not on the PATH. If you have a specific bash
 configuration that is not taken into account by the cron job you might need to
 add the following lines to your crontab:
 
+```shell
 SHELL=path/of/your/bash/executable
 BASH\_ENV=path/of/your/bash/config
+```
