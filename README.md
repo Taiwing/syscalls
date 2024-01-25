@@ -4,12 +4,22 @@ A small web application that lists the linux kernel syscalls for each available
 architecture. It does this with a script that parses the kernel's source code.
 Then static html pages are generated from the collected data.
 
+## Description
+
 The main goal of this project is to automate the process so that this resource
-can be kept up-to-date without manual intervention.
+can be kept up-to-date without manual intervention. This application is up and
+running at the following address:
 
-## Setup
+https://syscalls.defoy.tech
 
-### Prerequisites
+It is updated once a week (every monday). The lists are available for each
+architecture supported by the linux kernel as well as for the "generic
+architectures" (the default syscall lists for 32bit and 64bit processors). They
+can be consulted directly on the site or downloaded in the CSV format.
+
+## Local Setup
+
+### Dependencies
 
 This project is made to run on a linux system with at least the following
 programs available:
