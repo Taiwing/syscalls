@@ -12,7 +12,19 @@ can be kept up-to-date without manual intervention.
 ```shell
 # clone it (downloading the kernel will take some time)
 git clone --recurse-submodules https://github.com/Taiwing/syscalls
+```
 
+The first thing you need to do is to create an environment file for the
+application. To use the default values you can simply copy the _env.sample_ file
+at the root of the repository and rename it to _.env_:
+
+```shell
+cp env.sample .env
+```
+
+Then you can build the application and run it:
+
+```shell
 # build the front
 make -C build/
 
