@@ -17,9 +17,6 @@ front:
 	  syscalls, "not implemented" count, "missing" count (do not add "anon" I
 	  think, this is not really useful for the end-user and it is in the csv
 	  files anyway), and max syscall NR.
-	- Make the overall home page clearer. Add a little informative section about
-	  what are the kernel and syscalls, as well as why this application was
-	  necessary.
 
 find_syscalls:
 	- continue remaking the find_syscalls script into python

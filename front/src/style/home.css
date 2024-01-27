@@ -1,10 +1,14 @@
-main p {
-	width: 70%;
+main p, main ul, main h2 {
+	max-width: 1000px;
 }
 
 main ul {
 	display: flex;
 	flex-direction: column;
+}
+
+main h2 {
+	width: 100%;
 }
 
 #csv-download {

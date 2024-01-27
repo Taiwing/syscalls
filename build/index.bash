@@ -26,16 +26,17 @@ ARCH_DIR="arch"
 print_main() {
     cat <<EOF
 		<main>
+			<h1>Syscalls</h1>
 			<p>
-				This website contains a list of every system call for each
-				architecture supported by the Linux kernel. The data is
-				extracted directly from the last version of the kernel source
-				code. The script that does this is executed at regular
-				intervals, therefore it should always be up-to-date.
+				This website lists every system call for each architecture
+				supported by the Linux kernel. The data is extracted directly
+				from the last version of the kernel source code. The script that
+				does this is executed at regular intervals, therefore it should
+				always be up-to-date.
 			</p>
 			<p id="csv-download">
 				<a href="csv/syscalls.tar.gz" download>
-					Download all syscalls as CSV
+					Download every syscall list as CSV
 				</a>
 			</p>
 			<ul>
@@ -48,6 +49,28 @@ EOF
     done
     cat <<EOF
 			</ul>
+			<h2>What is a syscall?</h2>
+			<p>
+				A system call is a function provided by the kernel that can be
+				used by user-space programs. It is the only way for a program to
+				interact with the kernel. For example, if a program wants to
+				write something to a file, it will have to use the
+				<code>write</code> syscall. The program will pass the file
+				descriptor, the buffer and the size of the buffer to the kernel
+				through the syscall. The kernel will then write the content of
+				the buffer to the file and return the number of bytes written.
+			</p>
+			<h2>Why so many lists?</h2>
+			<p>
+				For historical and technical reasons, the Linux kernel supports
+				a lot of architectures with different system calls sets. Some
+				might be implemented differently, some might not be implemented
+				at all. Or they might simply be ordered differently. However not
+				every architecture has its own syscall list. Some of them share
+				the same generic list, either the 32bit or the 64bit version.
+				They are the standard API for newer architectures.
+			</p>
+			<h2>Syscall status</h2>
 			<p>
 				The syscall lists are always complete, meaning that there won't
 				be any missing syscall. However, some syscalls might not have
