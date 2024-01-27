@@ -82,6 +82,21 @@
 				the same generic list, either the 32bit or the 64bit version.
 				They are the standard API for newer architectures.
 			</p>
+			<h2>Listing the kernel syscalls</h2>
+			<p>
+				In order to list the syscalls, the script parses the kernel
+				source code. It looks for the table files for each specific
+				architecture. These files are located in the <code>arch</code>
+				directory of the kernel source code. From there, taking the
+				Kconfig options into account, it will extract the syscall
+				parameters from the C files.
+			</p>
+			<p>
+				The generic syscalls lists are directly based on the generic
+				<code>unistd.h</code> header file. It is preprocessed to make
+				sure that every optional syscall is included. The script will
+				then extract the parameters from the C files as well.
+			</p>
 			<h2>Syscall status</h2>
 			<p>
 				The syscall lists are always complete, meaning that there won't
