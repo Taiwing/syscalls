@@ -1,7 +1,6 @@
 --- TODO ---
 
 front:
-	- separate the generic tables from the rest and explain what they are
 	- add a paragraph about how the source files are preprocessed, basically
 	  that as many syscalls are added as possible with the
 	  '__ARCH_WANT_<some syscall>' macros and that in case of multiple

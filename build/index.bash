@@ -39,14 +39,35 @@ print_main() {
 					Download every syscall list as CSV
 				</a>
 			</p>
+EOF
+
+	# list generic architectures
+	cat <<EOF
+			<h2>Generic Architectures</h2>
 			<ul>
 EOF
-    for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR}); do
+	for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR} | grep -e 'generic_*');
+	do
+		ARCH="$(basename "${SYSCALL_PAGE}" .html)"
+		cat <<EOF
+				<li><a href="${ARCH_DIR}/${SYSCALL_PAGE}">${ARCH}</a></li>
+EOF
+	done
+
+	# list non-generic architectures
+	cat <<EOF
+			</ul>
+			<h2>Specific Architectures</h2>
+			<ul>
+EOF
+	for SYSCALL_PAGE in $(ls ${OUTPUT_DIR}/${ARCH_DIR} | grep -ve 'generic_*');
+	do
 		ARCH="$(basename "${SYSCALL_PAGE}" .html)"
 		cat <<EOF
 				<li><a href="${ARCH_DIR}/${SYSCALL_PAGE}">${ARCH}</a></li>
 EOF
     done
+
     cat <<EOF
 			</ul>
 			<h2>What is a syscall?</h2>

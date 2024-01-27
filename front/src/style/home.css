@@ -1,4 +1,5 @@
 main p, main ul, main h2 {
+	width: 100%;
 	max-width: 1000px;
 }
 
@@ -7,17 +8,7 @@ main ul {
 	flex-direction: column;
 }
 
-main h2 {
-	width: 100%;
-}
-
 #csv-download {
 	display: flex;
 	justify-content: center;
-}
-
-@media only screen and (max-width: 1599px) {
-	main p, main ul {
-		width: 100%;
-	}
 }
