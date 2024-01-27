@@ -13,6 +13,7 @@ find_syscalls:
 	  unistd.h file (with some macros defining which syscall is wanted), like
 	  nios2 or csky (basically every directory under arch/ that is not yet
 	  listed by the script)
+	- check every architecture name and as many special cases as necessary
 
 repo:
 	- gather every part into one script to rule them all
