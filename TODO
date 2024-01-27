@@ -1,16 +1,10 @@
 --- TODO ---
 
 front:
-	- Maybe add special cases for some architectures, like "powerpc_nospu_32"
-	  and "powerpc_nospu_64" which should just be named "powerpc_<32|64>", or
-	  "x86_i386" which should really be either "i386" or "x86_32" and "x86_x32"
-	  which should just be "x32". The smart thing should be to add the
-	  architecture name and the eventual ABIs as separate infos so that the
-	  pages can be listed together when need be.
-	- Anyway, add info on top of arch pages, arch name, abi if any, number of
-	  syscalls, "not implemented" count, "missing" count (do not add "anon" I
-	  think, this is not really useful for the end-user and it is in the csv
-	  files anyway), and max syscall NR.
+	- add info on top of arch pages, arch name, abi if any, number of syscalls,
+	  "not implemented" count, "missing" count (do not add "anon" I think, this
+	  is not really useful for the end-user and it is in the csv files anyway),
+	  and max syscall NR
 
 find_syscalls:
 	- continue remaking the find_syscalls script into python

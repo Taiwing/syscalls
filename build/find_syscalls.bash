@@ -43,8 +43,12 @@ TARGET_ABIS=("common" $ABI_NAME)
 
 # set unique ARCH_ABI identifier
 ARCH_ABI="${ARCH_NAME}"
-if [ "${ABI_NAME}" != "common" ]; then
-	ARCH_ABI="${ARCH_ABI}_$(echo ${ABI_NAME} | tr ' ' '_')"
+if [ "${ARCH_NAME}" = "x86" -a "${ABI_NAME}" != "64" ]; then
+	# handle special case for x86 (only keep the ABI name)
+	ARCH_ABI="${ABI_NAME}"
+elif [ "${ABI_NAME}" != "common" ]; then
+	# keep only the last word of the ABI name (powerpc has multi word ABIs)
+	ARCH_ABI="${ARCH_ABI}_${ABI_NAME##* }"
 fi
 
 # get address size (32 or 64)
