@@ -1,13 +1,17 @@
 --- TODO ---
 
 find_syscalls:
-	- continue remaking the find_syscalls script into python
 	- handle syscalls implemented directly in assembly
 	- add architectures that are based on the generic ABI and have a specific
 	  unistd.h file (with some macros defining which syscall is wanted), like
 	  nios2 or csky (basically every directory under arch/ that is not yet
 	  listed by the script)
-	- check every architecture name and as many special cases as necessary
+	- check every architecture name and add as many special cases as necessary
+
+--- MAYBE ---
+
+find_syscalls:
+	- continue remaking the find_syscalls script into python
 
 repo:
 	- gather every part into one script to rule them all
