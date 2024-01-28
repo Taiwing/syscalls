@@ -285,10 +285,10 @@ function parse_syscall_define {
 
 # special cases where the Kconfig section name is not the same as the arch name
 declare -A SPECIFIC_CONFIG_NAMES
-SPECIFIC_CONFIG_NAMES["x86_i386"]="X86_32 COMPAT_32"
+SPECIFIC_CONFIG_NAMES["i386"]="X86_32 COMPAT_32"
 SPECIFIC_CONFIG_NAMES["x86_64"]="X86_64"
-SPECIFIC_CONFIG_NAMES["powerpc_nospu_32"]="PPC"
-SPECIFIC_CONFIG_NAMES["powerpc_nospu_64"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_32"]="PPC"
+SPECIFIC_CONFIG_NAMES["powerpc_64"]="PPC"
 SPECIFIC_CONFIG_NAMES["powerpc_spu"]="PPC"
 SPECIFIC_CONFIG_NAMES["sh"]="SUPERH"
 
