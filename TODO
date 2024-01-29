@@ -8,7 +8,17 @@ find_syscalls:
 	  listed by the script)
 	- check every architecture name and add as many special cases as necessary
 
+update:
+	- make it so new files are also added (useful for newly supported
+	  architectures)
+
 --- MAYBE ---
+
+front:
+	- update the description to mention the fact that the lists are updated
+	  once a week (every monday)
+	- add a "diff" section to show the changes from last week (maybe literally
+	  use the diff command for this)
 
 find_syscalls:
 	- continue remaking the find_syscalls script into python
