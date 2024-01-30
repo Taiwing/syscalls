@@ -1,0 +1,64 @@
+arch: powerpc
+abi: nospu 32
+sys_debug_setcontext -> arch/powerpc/include/asm/syscalls.h
+
+arch: m68k
+abi: common
+sys_sigreturn -> arch/m68k/kernel/entry.S
+
+arch: arm
+abi: common
+sys_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+sys_rt_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+
+arch: arm
+abi: oabi
+sys_syscall -> arch/arm/kernel/entry-common.S
+sys_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+sys_rt_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+
+arch: arm
+abi: eabi
+sys_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+sys_rt_sigreturn_wrapper -> arch/arm/kernel/entry-common.S
+
+arch: microblaze
+abi: common
+sys_rt_sigreturn_wrapper -> arch/microblaze/kernel/entry.S
+
+arch: parisc
+abi: 32
+sys_rt_sigreturn_wrapper -> arch/parisc/kernel/entry.S
+
+arch: parisc
+abi: 64
+sys_rt_sigreturn_wrapper -> arch/parisc/kernel/entry.S
+
+arch: mips
+abi: n64
+sys_mips_mmap -> ???
+
+arch: mips
+abi: o32
+sys_syscall -> arch/mips/kernel/scall32-o32.S
+sys_mips_mmap -> ???
+sys_mips_mmap2 -> ???
+
+arch: mips
+abi: n32
+sys_mips_mmap -> ???
+
+arch: sparc
+abi: 32
+sunos_execv -> arch/sparc/kernel/syscalls.S && arch/sparc/kernel/entry.S
+sys_sigreturn -> arch/sparc/kernel/entry.S
+
+arch: x86
+abi: i386
+sys_sigreturn -> arch/x86/um/signal.c
+
+arch: alpha
+abi: common
+alpha_syscall_zero -> arch/alpha/kernel/entry.S
+sys_osf_mmap -> ???
+sys_sigreturn -> ???
