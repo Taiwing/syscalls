@@ -17,8 +17,8 @@ ABI_NAME_ARG_OLD=""
 LINUX_PATH="${ROOT}/linux"
 
 # path to the syscall tables
-# generic tables
-TABLE_FILES="$(find ${LINUX_PATH} -maxdepth 1 -type f -name '*.tbl')"
+# generic and generic-based tables
+TABLE_FILES="$(find ${LINUX_PATH}/tbl -maxdepth 1 -type f -name '*.tbl')"
 # architecture specific tables
 TABLE_FILES="$TABLE_FILES $(\
 	find ${LINUX_PATH}/arch -type f -name 'syscall*.tbl'
@@ -31,7 +31,7 @@ for TABLE_FILE in ${TABLE_FILES}; do
 
 	# extract the architecture
 	[[ $TABLE_FILE =~ arch/([^/]+)/.*syscall.*\.tbl ]] || \
-	[[ $TABLE_FILE =~ (generic)_(32|64)\.tbl ]]
+	[[ $TABLE_FILE =~ tbl/([^_]+).*\.tbl ]]
 	ARCH_NAME="${BASH_REMATCH[1]}"
 
 	# if the architecture is specified, skip all others

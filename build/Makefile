@@ -1,5 +1,6 @@
 FRONT_DIR := ../front
 LINUX_DIR := ../linux
+TBL_DIR := ${LINUX_DIR}/tbl
 CSV_DIR := ${FRONT_DIR}/csv
 SRC_DIR := ${FRONT_DIR}/src
 ARCH_DIR := ${SRC_DIR}/arch
@@ -18,18 +19,18 @@ ${CSV_DIR}/syscalls.tar.gz: ${CSV_DIR}
 
 ${CSV_DIR}: last_run
 
-last_run: ${LINUX_DIR}/generic_32.tbl ${LINUX_DIR}/generic_64.tbl
+last_run: ${TBL_DIR}
 	mkdir -p ${CSV_DIR}
 	./foreach_arch_abi.bash
 
-${LINUX_DIR}/generic_32.tbl:
+${TBL_DIR}:
+	mkdir -p $@
+	./foreach_notable_arch.bash
 	./generate_table.bash generic 32 32
-
-${LINUX_DIR}/generic_64.tbl:
 	./generate_table.bash generic 64 64
 
 clean:
-	rm -f ${LINUX_DIR}/generic_*.tbl
+	rm -rf ${TBL_DIR}
 
 fclean: clean
 	rm -f last_run

@@ -27,10 +27,17 @@ ARCH_NAME="${1}"
 ABI_NAME="${2}"
 # architecture bitness
 ARCH_BITNESS="${3}"
+# architecture only
+ARCH_ONLY="${4}"
 # architecture and abi combined
 ARCH_ABI="${ARCH_NAME}_${ABI_NAME}"
+# path to the output directory
+OUTPUT_DIR="tbl"
+mkdir -p $OUTPUT_DIR
 # path to the output file
-OUTPUT_FILE="${ARCH_NAME}_${ABI_NAME}.tbl"
+OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_NAME}_${ABI_NAME}.tbl"
+# if ARCH_ONLY (when theres only one ABI)
+[ ! -z "$ARCH_ONLY" ] && OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_NAME}.tbl"
 
 # path to the generic table source file
 GENERIC_SOURCE="include/uapi/asm-generic/unistd.h"
