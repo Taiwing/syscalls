@@ -9,7 +9,5 @@ find_syscalls:
 --- MAYBE ---
 
 front:
-	- update the description to mention the fact that the lists are updated
-	  once a week (every monday)
 	- add a "diff" section to show the changes from last week (maybe literally
 	  use the diff command for this)

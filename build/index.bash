@@ -31,8 +31,8 @@ print_main() {
 				This website lists every system call for each architecture
 				supported by the Linux kernel. The data is extracted directly
 				from the last version of the kernel source code. The script that
-				does this is executed at regular intervals, therefore it should
-				always be up-to-date.
+				does this is executed once a week, therefore it should always be
+				up-to-date.
 			</p>
 			<p id="csv-download">
 				<a href="csv/syscalls.tar.gz" download>
