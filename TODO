@@ -6,10 +6,6 @@ find_syscalls:
 	- check the new architectures with other lists: arc, arm64, csky, hexagon,
 	  loongarch_32, loongarch_64, nios2, openrisc, riscv_32, riscv_64
 
-update:
-	- make it so new files are also added (useful for newly supported
-	  architectures)
-
 --- MAYBE ---
 
 front:
