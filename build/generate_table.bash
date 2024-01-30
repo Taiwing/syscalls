@@ -70,6 +70,7 @@ replace_macros() {
 	local SOURCE_FILE="$1"
 	local ARCH="$2"
 	local BITNESS="$3"
+	local ABI="$4"
 
 	# add our own defines:
 	# - __BITS_PER_LONG: the bitness of the architecture
@@ -83,10 +84,10 @@ replace_macros() {
 	# number to perform the eventual computation yielded by the macro (eval)
 	cat <<EOF
 #define __BITS_PER_LONG						${BITNESS}
-#define __SYSCALL(x, y)						row: \$((x)) ${BITNESS} #x y
-#define __SC_COMP(x, y, z)					row: \$((x)) ${BITNESS} #x y
-#define __SC_3264(x, y_32, y_64)			row: \$((x)) ${BITNESS} #x y_${BITNESS}
-#define __SC_COMP_3264(x, y_32, y_64, z)	row: \$((x)) ${BITNESS} #x y_${BITNESS}
+#define __SYSCALL(x, y)						row: \$((x)) ${ABI} #x y
+#define __SC_COMP(x, y, z)					row: \$((x)) ${ABI} #x y
+#define __SC_3264(x, y_32, y_64)			row: \$((x)) ${ABI} #x y_${BITNESS}
+#define __SC_COMP_3264(x, y_32, y_64, z)	row: \$((x)) ${ABI} #x y_${BITNESS}
 #define ALIAS(x, y)							alias: #y #x
 EOF
 
@@ -166,8 +167,8 @@ main() {
 
 	# replace syscall macros
 	mkdir -p "$TMP_ASM_GENERIC_PATH"
-	replace_macros "$HEADLESS_GENERIC_FILE" "$ARCH_NAME" "$ARCH_BITNESS" \
-		> "$TMP_ASM_GENERIC_PATH/unistd.h"
+	replace_macros "$HEADLESS_GENERIC_FILE" "$ARCH_NAME" \
+		"$ARCH_BITNESS" "$ABI_NAME" > "$TMP_ASM_GENERIC_PATH/unistd.h"
 
 	# preprocess the header file according to the architecture
 	mkdir -p "$TMP_ASM_PATH"

@@ -75,14 +75,14 @@ main() {
 	cd - > /dev/null
 	cd $ROOT > /dev/null
 	for ARCH in "${!ABIS[@]}"; do
-		# if there is more than one ABI
-		ARCH_ONLY=""
-		[ $(echo ${ABIS[$ARCH]} | wc -w) -lt 2 ] && ARCH_ONLY="yes"
-
-		# generate the table file
-		for ABI in ${ABIS[$ARCH]}; do
-			./build/generate_table.bash $ARCH $ABI $ABI $ARCH_ONLY
-		done
+		# if there is only one ABI
+		if [ $(echo ${ABIS[$ARCH]} | wc -w) -lt 2 ]; then
+			./build/generate_table.bash $ARCH common ${ABIS[$ARCH]} yes
+		else
+			for ABI in ${ABIS[$ARCH]}; do
+				./build/generate_table.bash $ARCH $ABI $ABI ""
+			done
+		fi
 	done
 }
 
