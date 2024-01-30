@@ -2,11 +2,9 @@
 
 find_syscalls:
 	- handle syscalls implemented directly in assembly
-	- add architectures that are based on the generic ABI and have a specific
-	  unistd.h file (with some macros defining which syscall is wanted), like
-	  nios2 or csky (basically every directory under arch/ that is not yet
-	  listed by the script)
 	- check every architecture name and add as many special cases as necessary
+	- check the new architectures with other lists: arc, arm64, csky, hexagon,
+	  loongarch_32, loongarch_64, nios2, openrisc, riscv_32, riscv_64
 
 update:
 	- make it so new files are also added (useful for newly supported
@@ -19,9 +17,3 @@ front:
 	  once a week (every monday)
 	- add a "diff" section to show the changes from last week (maybe literally
 	  use the diff command for this)
-
-find_syscalls:
-	- continue remaking the find_syscalls script into python
-
-repo:
-	- gather every part into one script to rule them all
