@@ -23,10 +23,10 @@ last_run: ${LINUX_DIR}/generic_32.tbl ${LINUX_DIR}/generic_64.tbl
 	./foreach_arch_abi.bash
 
 ${LINUX_DIR}/generic_32.tbl:
-	./generic_table.bash 32
+	./generate_table.bash generic 32 32
 
 ${LINUX_DIR}/generic_64.tbl:
-	./generic_table.bash 64
+	./generate_table.bash generic 64 64
 
 clean:
 	rm -f ${LINUX_DIR}/generic_*.tbl
