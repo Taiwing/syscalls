@@ -213,7 +213,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 213,swapoff,ok,long,1,const char * specialfile,,,,,
 214,sysinfo,ok,long,1,struct sysinfo * info,,,,,
 215,ipc,ok,long,6,unsigned int call,int first,unsigned long second,unsigned long third,void * ptr,long fifth
-216,sigreturn,missing,,,,,,,,
+216,sigreturn,ok,long,0,,,,,,
 217,clone,ok,long,5,unsigned long clone_flags,unsigned long newsp,int * parent_tidptr,int * child_tidptr,unsigned long tls,
 218,ioprio_get,ok,long,2,int which,int who,,,,
 219,adjtimex,ok,long,1,struct __kernel_timex * txc_p,,,,,

@@ -627,6 +627,39 @@ function find_by_define {
 	return $RESULT
 }
 
+# where to look for the asm files
+VALID_ASM_PATHS=()
+[ "$ARCH_NAME" != "generic" ] && VALID_ASM_PATHS+=("arch/$ARCH_NAME")
+
+# which syscalls should be looked for in the asm files (special cases)
+VALID_ASM_SYSCALLS=("sigreturn" "rt_sigreturn")
+
+# This only works for some syscalls which have an asm entry point and for which
+# the prototype is already known (it is actually hard-coded as there's only one
+# possible prototype for each of these syscalls right now). This is really just
+# to check that the entry point actually exists.
+function find_by_asm {
+	local SYS_ENTRY=$3
+	local FILES=()
+	local RESULT=0
+
+	# find the syscall in the asm files
+	OUTPUT=()
+	for ASM_PATH in ${VALID_ASM_PATHS[@]}; do
+		OUTPUT=($(rg --glob '*.S' --count-matches "\b$SYS_ENTRY\b" $ASM_PATH))
+		if [ ${#OUTPUT[@]} -gt 0 ]; then
+			FILES+=($(echo ${OUTPUT[0]} | cut -d ':' -f 1))
+			RESULT=1
+			break
+		fi
+	done
+
+	# print the result
+	echo "${FILES[@]}"
+
+	return $RESULT
+}
+
 # find all the syscall prototypes
 UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
@@ -652,6 +685,14 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		if [ $RESULT -ne 1 ]; then
 			METHOD="prototype"
 			FILES=($(find_by_prototype $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
+			RESULT=$?
+		fi
+
+		# if we dont have a syscall yet, try to find it in the asm files
+		if [ $RESULT -eq 0 ] && [[ ${VALID_ASM_SYSCALLS[@]} =~ $SYS_NAME ]];
+		then
+			METHOD="asm"
+			FILES=($(find_by_asm $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
 			RESULT=$?
 		fi
 
@@ -681,9 +722,11 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		if [ $METHOD = "prototype" ]; then
 			DETAILS=$(get_details_by_prototype $SYS_ENTRY $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_prototype "$SYS_ENTRY" "$DETAILS")
-		else
+		elif [ $METHOD = "define" ]; then
 			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
+		elif [ $METHOD = "asm" ]; then
+			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
 		fi
 		PARSED=$?
 

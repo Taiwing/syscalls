@@ -97,7 +97,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 116,sysinfo,ok,long,1,struct sysinfo * info,,,,,
 117,ipc,ok,long,6,unsigned int call,int first,unsigned long second,unsigned long third,void * ptr,long fifth
 118,fsync,ok,long,1,unsigned int fd,,,,,
-119,sigreturn,missing,,,,,,,,
+119,sigreturn,ok,long,0,,,,,,
 120,clone,ok,long,5,unsigned long clone_flags,unsigned long newsp,int * parent_tidptr,unsigned long tls,int * child_tidptr,
 121,setdomainname,ok,long,2,char * name,int len,,,,
 122,uname,ok,long,1,struct old_utsname * name,,,,,
@@ -145,7 +145,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 170,setresgid,ok,long,3,gid_t rgid,gid_t egid,gid_t sgid,,,
 171,getresgid,ok,long,3,gid_t * rgidp,gid_t * egidp,gid_t * sgidp,,,
 172,prctl,ok,long,5,int option,unsigned long arg2,unsigned long arg3,unsigned long arg4,unsigned long arg5,
-173,rt_sigreturn,missing,,,,,,,,
+173,rt_sigreturn,ok,long,0,,,,,,
 174,rt_sigaction,ok,long,4,int sig,const struct sigaction * act,struct sigaction * oact,size_t sigsetsize,,
 175,rt_sigprocmask,ok,long,4,int how,sigset_t * nset,sigset_t * oset,size_t sigsetsize,,
 176,rt_sigpending,ok,long,2,sigset_t * uset,size_t sigsetsize,,,,
