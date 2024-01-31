@@ -30,11 +30,15 @@ ${TBL_DIR}:
 clean:
 	rm -rf ${TBL_DIR}
 
-fclean: clean
+front_clean:
 	rm -f ${SRC_DIR}/index.html
 	rm -rf ${ARCH_DIR}
+
+fclean: clean front_clean
 	rm -rf ${CSV_DIR}
 
 re: fclean all
 
-.PHONY: all clean fclean re
+front: front_clean all
+
+.PHONY: all clean front_clean fclean re front
