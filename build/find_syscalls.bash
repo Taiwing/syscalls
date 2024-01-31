@@ -671,15 +671,24 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	SYS_NUMBER=${SCOLS[0]}
 	SYS_NAME=${SCOLS[1]}
 	SYS_ENTRY=${SCOLS[2]}
+	#remove sys_ prefix from SYS_ENTRY if any
+	SYS_ENTRY_NAME=${SYS_ENTRY#sys_}
 
 	# find the syscall file
 	FILE=""
 	RESULT=0
 	METHOD=""
 	if [ $SYS_ENTRY != "sys_ni_syscall" ]; then
-		METHOD="define"
+		METHOD="define-name"
 		FILES=($(find_by_define $SYS_NUMBER $SYS_NAME $SYS_ENTRY))
 		RESULT=$?
+
+		# try to find the syscall define by entry point name
+		if [ $RESULT -ne 1 -a $SYS_NAME != $SYS_ENTRY_NAME ]; then
+			METHOD="define-entry"
+			FILES=($(find_by_define $SYS_NUMBER $SYS_ENTRY_NAME $SYS_ENTRY))
+			RESULT=$?
+		fi
 
 		# if we did not get a unique syscall, try to find it by prototype
 		if [ $RESULT -ne 1 ]; then
@@ -722,9 +731,12 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		if [ $METHOD = "prototype" ]; then
 			DETAILS=$(get_details_by_prototype $SYS_ENTRY $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_prototype "$SYS_ENTRY" "$DETAILS")
-		elif [ $METHOD = "define" ]; then
+		elif [ $METHOD = "define-name" ]; then
 			DETAILS=$(get_details_by_define $SYS_NAME $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_NAME" "$DETAILS")
+		elif [ $METHOD = "define-entry" ]; then
+			DETAILS=$(get_details_by_define $SYS_ENTRY_NAME $FILE)
+			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_ENTRY_NAME" "$DETAILS")
 		elif [ $METHOD = "asm" ]; then
 			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
 		fi
