@@ -23,7 +23,9 @@
 #   mean that the syscall is implemented in a different way (e.g. using a
 #   different name or a different prototype)
 
-#################### SCRIPT CONFIGURATION ####################
+###############################################################################
+# Configuration
+###############################################################################
 
 # set the path to the root of the git repository
 ROOT="$(git rev-parse --show-toplevel)"
@@ -65,7 +67,9 @@ OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.csv"
 echo -n "nr,name,status,return_type,param_count," > $OUTPUT_FILE
 echo "param1,param2,param3,param4,param5,param6" >> $OUTPUT_FILE
 
-#################### CLEANUP ####################
+###############################################################################
+# Cleanup
+###############################################################################
 
 # remove temporary files
 function cleanup {
@@ -75,7 +79,9 @@ function cleanup {
 # cleanup on exit
 trap cleanup EXIT
 
-#################### PARSE SYSCALL TABLE ####################
+###############################################################################
+# Parse syscall table
+###############################################################################
 
 # read the table file line by line
 SYS_CALLS=()
@@ -107,7 +113,9 @@ while read LINE; do
 	SYS_CALLS+=("$SYS_NUMBER $SYS_NAME ${SYS_ENTRY:-sys_ni_syscall}")
 done < $ARCH_FILE
 
-#################### PARSE DECLARATIONS ####################
+###############################################################################
+# Parse declarations
+###############################################################################
 
 # list of kernel types
 # output of the following command (with some manual cleanup, removed 'const',
@@ -280,8 +288,9 @@ function parse_syscall_define {
 	return 0
 }
 
-
-#################### DISAMBIGUATION ####################
+###############################################################################
+# Disambiguation
+###############################################################################
 
 # special cases where the Kconfig section name is not the same as the arch name
 declare -A SPECIFIC_CONFIG_NAMES
@@ -356,7 +365,9 @@ function preprocess_source_file {
 	return 0
 }
 
-#################### FIND SYSCALL DECLARATIONS ####################
+###############################################################################
+# Find syscall declarations
+###############################################################################
 
 # prototype paths in priority order
 VALID_PROTOTYPE_PATHS=()
@@ -712,9 +723,10 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	fi
 done
 
-#################### PRINT RESULTS ####################
+###############################################################################
+# Print results
+###############################################################################
 
-# print the results
 echo
 echo -n "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
 if [ $ANONYMOUS_PARAMETERS_COUNT -gt 0 ]; then
