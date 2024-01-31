@@ -111,7 +111,7 @@ EOF
 				The syscall lists are always complete, meaning that there won't
 				be any missing syscall. However, some syscalls might not have
 				any parameter listed. Most of the time, this is because the
-				syscall is not implemented yet. The status will be 'todo' in the
+				syscall is not implemented. The status will be 'notimp' in the
 				csv files. In some rare cases, this can be because the script
 				was not able to find or parse the syscall declaration. The
 				status will be set to 'missing' in the csv files. Right now,

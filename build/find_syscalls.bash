@@ -741,7 +741,7 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	# count errors and found syscalls
 	if [ $SYS_ENTRY = "sys_ni_syscall" ]; then
 		NOT_IMPLEMENTED_COUNT=$((NOT_IMPLEMENTED_COUNT+1))
-		echo "$SYS_NUMBER,$SYS_NAME,todo,,,,,,,," >> $OUTPUT_FILE
+		echo "$SYS_NUMBER,$SYS_NAME,notimp,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 0 ]; then
 		NOT_FOUND_COUNT=$((NOT_FOUND_COUNT+1))
 		echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() not found"

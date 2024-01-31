@@ -88,6 +88,9 @@ while read LINE; do
 	PARAM5="${ARRAY[9]:-$DEFAULT_PARAM}"
 	PARAM6="${ARRAY[10]:-$DEFAULT_PARAM}"
 
+	# skip if the syscall is not implemented
+	[ $STATUS = 'notimp' ] && continue
+
 	# update MAX_NR
 	[ $NR -gt $MAX_NR ] && MAX_NR=$NR
 
