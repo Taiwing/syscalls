@@ -115,9 +115,9 @@ EOF
 				csv files. In some rare cases, this can be because the script
 				was not able to find or parse the syscall declaration. The
 				status will be set to 'missing' in the csv files. Right now,
-				this is only the case for syscalls directly implemented in
-				assembly. This is not yet supported by the parsing script but it
-				might be in the future.
+				this is only the case for some syscalls directly implemented in
+				assembly. This is not yet totally supported by the parsing
+				script but it might be in the future.
 			</p>
 			<p>
 				Other syscalls might be lacking some information about their
