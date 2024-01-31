@@ -283,23 +283,23 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 292,io_pgetevents,ok,long,6,aio_context_t ctx_id,long min_nr,long nr,struct io_event * events,struct __kernel_timespec * timeout,const struct __aio_sigset * usig
 293,rseq,ok,long,4,struct rseq * rseq,u32 rseq_len,int flags,u32 sig,,
 294,kexec_file_load,ok,long,5,int kernel_fd,int initrd_fd,unsigned long cmdline_len,const char * cmdline_ptr,unsigned long flags,
-403,clock_gettime64,ok,long,2,clockid_t which_clock,struct __kernel_timespec * tp,,,,
-404,clock_settime64,ok,long,2,clockid_t which_clock,const struct __kernel_timespec * tp,,,,
-405,clock_adjtime64,ok,long,2,clockid_t which_clock,struct __kernel_timex * tx,,,,
-406,clock_getres_time64,ok,long,2,clockid_t which_clock,struct __kernel_timespec * tp,,,,
-407,clock_nanosleep_time64,ok,long,4,clockid_t which_clock,int flags,const struct __kernel_timespec * rqtp,struct __kernel_timespec * rmtp,,
+403,clock_gettime64,ok,long,2,const clockid_t which_clock,struct __kernel_timespec * tp,,,,
+404,clock_settime64,ok,long,2,const clockid_t which_clock,const struct __kernel_timespec * tp,,,,
+405,clock_adjtime64,ok,long,2,const clockid_t which_clock,struct __kernel_timex * utx,,,,
+406,clock_getres_time64,ok,long,2,const clockid_t which_clock,struct __kernel_timespec * tp,,,,
+407,clock_nanosleep_time64,ok,long,4,const clockid_t which_clock,int flags,const struct __kernel_timespec * rqtp,struct __kernel_timespec * rmtp,,
 408,timer_gettime64,ok,long,2,timer_t timer_id,struct __kernel_itimerspec * setting,,,,
 409,timer_settime64,ok,long,4,timer_t timer_id,int flags,const struct __kernel_itimerspec * new_setting,struct __kernel_itimerspec * old_setting,,
 410,timerfd_gettime64,ok,long,2,int ufd,struct __kernel_itimerspec * otmr,,,,
 411,timerfd_settime64,ok,long,4,int ufd,int flags,const struct __kernel_itimerspec * utmr,struct __kernel_itimerspec * otmr,,
 412,utimensat_time64,ok,long,4,int dfd,const char * filename,struct __kernel_timespec * utimes,int flags,,
-413,pselect6_time64,anon,long,6,int,fd_set *,fd_set *,fd_set *,struct __kernel_timespec *,void *
-414,ppoll_time64,anon,long,5,struct pollfd *,unsigned int,struct __kernel_timespec *,const sigset_t *,size_t,
-416,io_pgetevents_time64,ok,long,6,aio_context_t ctx_id,long min_nr,long nr,struct io_event * events,struct __kernel_timespec * timeout,const struct __aio_sigset * sig
-417,recvmmsg_time64,ok,long,5,int fd,struct mmsghdr * msg,unsigned int vlen,unsigned flags,struct __kernel_timespec * timeout,
-418,mq_timedsend_time64,ok,long,5,mqd_t mqdes,const char * msg_ptr,size_t msg_len,unsigned int msg_prio,const struct __kernel_timespec * abs_timeout,
-419,mq_timedreceive_time64,ok,long,5,mqd_t mqdes,char * msg_ptr,size_t msg_len,unsigned int * msg_prio,const struct __kernel_timespec * abs_timeout,
-420,semtimedop_time64,ok,long,4,int semid,struct sembuf * sops,unsigned nsops,const struct __kernel_timespec * timeout,,
+413,pselect6_time64,ok,long,6,int n,fd_set * inp,fd_set * outp,fd_set * exp,struct __kernel_timespec * tsp,void * sig
+414,ppoll_time64,ok,long,5,struct pollfd * ufds,unsigned int nfds,struct __kernel_timespec * tsp,const sigset_t * sigmask,size_t sigsetsize,
+416,io_pgetevents_time64,ok,long,6,aio_context_t ctx_id,long min_nr,long nr,struct io_event * events,struct __kernel_timespec * timeout,const struct __aio_sigset * usig
+417,recvmmsg_time64,ok,long,5,int fd,struct mmsghdr * mmsg,unsigned int vlen,unsigned int flags,struct __kernel_timespec * timeout,
+418,mq_timedsend_time64,ok,long,5,mqd_t mqdes,const char * u_msg_ptr,size_t msg_len,unsigned int msg_prio,const struct __kernel_timespec * u_abs_timeout,
+419,mq_timedreceive_time64,ok,long,5,mqd_t mqdes,char * u_msg_ptr,size_t msg_len,unsigned int * u_msg_prio,const struct __kernel_timespec * u_abs_timeout,
+420,semtimedop_time64,ok,long,4,int semid,struct sembuf * tsops,unsigned int nsops,const struct __kernel_timespec * timeout,,
 421,rt_sigtimedwait_time64,ok,long,4,const sigset_t * uthese,siginfo_t * uinfo,const struct __kernel_timespec * uts,size_t sigsetsize,,
 422,futex_time64,ok,long,6,u32 * uaddr,int op,u32 val,const struct __kernel_timespec * utime,u32 * uaddr2,u32 val3
 423,sched_rr_get_interval_time64,ok,long,2,pid_t pid,struct __kernel_timespec * interval,,,,

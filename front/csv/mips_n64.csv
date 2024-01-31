@@ -8,7 +8,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 6,lstat,ok,long,2,const char * filename,struct __old_kernel_stat * statbuf,,,,
 7,poll,ok,long,3,struct pollfd * ufds,unsigned int nfds,int timeout_msecs,,,
 8,lseek,ok,long,3,unsigned int fd,off_t offset,unsigned int whence,,,
-9,mmap,missing,,,,,,,,
+9,mmap,ok,long,6,unsigned long addr,unsigned long len,unsigned long prot,unsigned long flags,unsigned long fd,off_t offset
 10,mprotect,ok,long,3,unsigned long start,size_t len,unsigned long prot,,,
 11,munmap,ok,long,2,unsigned long addr,size_t len,,,,
 12,brk,ok,long,1,unsigned long brk,,,,,

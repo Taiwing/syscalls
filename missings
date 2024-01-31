@@ -1,24 +1,10 @@
-arch: powerpc
-abi: nospu 32
-sys_debug_setcontext -> arch/powerpc/include/asm/syscalls.h
-
 arch: arm
 abi: oabi
 sys_syscall -> arch/arm/kernel/entry-common.S
 
 arch: mips
-abi: n64
-sys_mips_mmap -> ???
-
-arch: mips
 abi: o32
 sys_syscall -> arch/mips/kernel/scall32-o32.S
-sys_mips_mmap -> ???
-sys_mips_mmap2 -> ???
-
-arch: mips
-abi: n32
-sys_mips_mmap -> ???
 
 arch: sparc
 abi: 32
@@ -31,5 +17,4 @@ sys_sigreturn -> arch/x86/um/signal.c
 arch: alpha
 abi: common
 alpha_syscall_zero -> arch/alpha/kernel/entry.S
-sys_osf_mmap -> ???
 sys_sigreturn -> ???

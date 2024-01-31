@@ -69,7 +69,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 68,lstat,ok,long,2,const char * filename,struct __old_kernel_stat * statbuf,,,,
 69,osf_sbrk,notimp,,,,,,,,
 70,osf_sstk,notimp,,,,,,,,
-71,mmap,missing,,,,,,,,
+71,mmap,ok,long,6,unsigned long addr,unsigned long len,unsigned long prot,unsigned long flags,unsigned long fd,unsigned long off
 72,osf_old_vadvise,notimp,,,,,,,,
 73,munmap,ok,long,2,unsigned long addr,size_t len,,,,
 74,mprotect,ok,long,3,unsigned long start,size_t len,unsigned long prot,,,

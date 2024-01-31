@@ -3241,7 +3241,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -3254,7 +3254,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>const struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -3267,8 +3267,8 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
-						<td>struct __kernel_timex * tx</td>
+						<td>const clockid_t which_clock</td>
+						<td>struct __kernel_timex * utx</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -3280,7 +3280,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -3293,7 +3293,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>4</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>int flags</td>
 						<td>const struct __kernel_timespec * rqtp</td>
 						<td>struct __kernel_timespec * rmtp</td>
@@ -3368,27 +3368,27 @@
 					<tr>
 						<td>413</td>
 						<td>pselect6_time64</td>
-						<td>anon</td>
+						<td>ok</td>
 						<td>long</td>
 						<td>6</td>
-						<td>int</td>
-						<td>fd_set *</td>
-						<td>fd_set *</td>
-						<td>fd_set *</td>
-						<td>struct __kernel_timespec *</td>
-						<td>void *</td>
+						<td>int n</td>
+						<td>fd_set * inp</td>
+						<td>fd_set * outp</td>
+						<td>fd_set * exp</td>
+						<td>struct __kernel_timespec * tsp</td>
+						<td>void * sig</td>
 					</tr>
 					<tr>
 						<td>414</td>
 						<td>ppoll_time64</td>
-						<td>anon</td>
+						<td>ok</td>
 						<td>long</td>
 						<td>5</td>
-						<td>struct pollfd *</td>
-						<td>unsigned int</td>
-						<td>struct __kernel_timespec *</td>
-						<td>const sigset_t *</td>
-						<td>size_t</td>
+						<td>struct pollfd * ufds</td>
+						<td>unsigned int nfds</td>
+						<td>struct __kernel_timespec * tsp</td>
+						<td>const sigset_t * sigmask</td>
+						<td>size_t sigsetsize</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -3402,7 +3402,7 @@
 						<td>long nr</td>
 						<td>struct io_event * events</td>
 						<td>struct __kernel_timespec * timeout</td>
-						<td>const struct __aio_sigset * sig</td>
+						<td>const struct __aio_sigset * usig</td>
 					</tr>
 					<tr>
 						<td>417</td>
@@ -3411,9 +3411,9 @@
 						<td>long</td>
 						<td>5</td>
 						<td>int fd</td>
-						<td>struct mmsghdr * msg</td>
+						<td>struct mmsghdr * mmsg</td>
 						<td>unsigned int vlen</td>
-						<td>unsigned flags</td>
+						<td>unsigned int flags</td>
 						<td>struct __kernel_timespec * timeout</td>
 						<td>-</td>
 					</tr>
@@ -3424,10 +3424,10 @@
 						<td>long</td>
 						<td>5</td>
 						<td>mqd_t mqdes</td>
-						<td>const char * msg_ptr</td>
+						<td>const char * u_msg_ptr</td>
 						<td>size_t msg_len</td>
 						<td>unsigned int msg_prio</td>
-						<td>const struct __kernel_timespec * abs_timeout</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -3437,10 +3437,10 @@
 						<td>long</td>
 						<td>5</td>
 						<td>mqd_t mqdes</td>
-						<td>char * msg_ptr</td>
+						<td>char * u_msg_ptr</td>
 						<td>size_t msg_len</td>
-						<td>unsigned int * msg_prio</td>
-						<td>const struct __kernel_timespec * abs_timeout</td>
+						<td>unsigned int * u_msg_prio</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -3450,8 +3450,8 @@
 						<td>long</td>
 						<td>4</td>
 						<td>int semid</td>
-						<td>struct sembuf * sops</td>
-						<td>unsigned nsops</td>
+						<td>struct sembuf * tsops</td>
+						<td>unsigned int nsops</td>
 						<td>const struct __kernel_timespec * timeout</td>
 						<td>-</td>
 						<td>-</td>

@@ -157,15 +157,15 @@
 					<tr>
 						<td>9</td>
 						<td>mmap</td>
-						<td>missing</td>
-						<td></td>
-						<td></td>
-						<td>?</td>
-						<td>?</td>
-						<td>?</td>
-						<td>?</td>
-						<td>?</td>
-						<td>?</td>
+						<td>ok</td>
+						<td>long</td>
+						<td>6</td>
+						<td>unsigned long addr</td>
+						<td>unsigned long len</td>
+						<td>unsigned long prot</td>
+						<td>unsigned long flags</td>
+						<td>unsigned long fd</td>
+						<td>off_t offset</td>
 					</tr>
 					<tr>
 						<td>10</td>
@@ -4190,7 +4190,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -4203,7 +4203,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>const struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -4216,8 +4216,8 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
-						<td>struct __kernel_timex * tx</td>
+						<td>const clockid_t which_clock</td>
+						<td>struct __kernel_timex * utx</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
@@ -4229,7 +4229,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>2</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>struct __kernel_timespec * tp</td>
 						<td>-</td>
 						<td>-</td>
@@ -4242,7 +4242,7 @@
 						<td>ok</td>
 						<td>long</td>
 						<td>4</td>
-						<td>clockid_t which_clock</td>
+						<td>const clockid_t which_clock</td>
 						<td>int flags</td>
 						<td>const struct __kernel_timespec * rqtp</td>
 						<td>struct __kernel_timespec * rmtp</td>
@@ -4351,7 +4351,7 @@
 						<td>long nr</td>
 						<td>struct io_event * events</td>
 						<td>struct __kernel_timespec * timeout</td>
-						<td>const struct __aio_sigset * sig</td>
+						<td>const struct __aio_sigset * usig</td>
 					</tr>
 					<tr>
 						<td>417</td>
@@ -4373,10 +4373,10 @@
 						<td>long</td>
 						<td>5</td>
 						<td>mqd_t mqdes</td>
-						<td>const char * msg_ptr</td>
+						<td>const char * u_msg_ptr</td>
 						<td>size_t msg_len</td>
 						<td>unsigned int msg_prio</td>
-						<td>const struct __kernel_timespec * abs_timeout</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -4386,10 +4386,10 @@
 						<td>long</td>
 						<td>5</td>
 						<td>mqd_t mqdes</td>
-						<td>char * msg_ptr</td>
+						<td>char * u_msg_ptr</td>
 						<td>size_t msg_len</td>
-						<td>unsigned int * msg_prio</td>
-						<td>const struct __kernel_timespec * abs_timeout</td>
+						<td>unsigned int * u_msg_prio</td>
+						<td>const struct __kernel_timespec * u_abs_timeout</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -4399,8 +4399,8 @@
 						<td>long</td>
 						<td>4</td>
 						<td>int semid</td>
-						<td>struct sembuf * sops</td>
-						<td>unsigned nsops</td>
+						<td>struct sembuf * tsops</td>
+						<td>unsigned int nsops</td>
 						<td>const struct __kernel_timespec * timeout</td>
 						<td>-</td>
 						<td>-</td>
