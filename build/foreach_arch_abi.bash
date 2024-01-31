@@ -105,6 +105,3 @@ for TABLE_FILE in ${TABLE_FILES}; do
 		ABI_NAME_ARG_OLD=""
 	fi
 done
-
-# update the last_run file
-date -R > last_run

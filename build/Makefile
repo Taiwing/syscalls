@@ -17,9 +17,7 @@ ${ARCH_DIR}: ${CSV_DIR}
 ${CSV_DIR}/syscalls.tar.gz: ${CSV_DIR}
 	cd ${CSV_DIR} && tar -czf syscalls.tar.gz *.csv
 
-${CSV_DIR}: last_run
-
-last_run: ${TBL_DIR}
+${CSV_DIR}: ${TBL_DIR}
 	mkdir -p ${CSV_DIR}
 	./foreach_arch_abi.bash
 
@@ -33,7 +31,6 @@ clean:
 	rm -rf ${TBL_DIR}
 
 fclean: clean
-	rm -f last_run
 	rm -f ${SRC_DIR}/index.html
 	rm -rf ${ARCH_DIR}
 	rm -rf ${CSV_DIR}
