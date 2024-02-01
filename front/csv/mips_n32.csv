@@ -21,7 +21,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 19,writev,ok,long,3,unsigned long fd,const struct iovec * vec,unsigned long vlen,,,
 20,access,ok,long,2,const char * filename,int mode,,,,
 21,pipe,ok,long,1,int * fildes,,,,,
-22,_newselect,ok,long,5,int n,compat_ulong_t * inp,compat_ulong_t * outp,compat_ulong_t * exp,struct old_timeval32 * tvp,
+22,_newselect,ok,long,5,int n,fd_set * inp,fd_set * outp,fd_set * exp,struct __kernel_old_timeval * tvp,
 23,sched_yield,ok,long,0,,,,,,
 24,mremap,ok,long,5,unsigned long addr,unsigned long old_len,unsigned long new_len,unsigned long flags,unsigned long new_addr,
 25,msync,ok,long,3,unsigned long start,size_t len,int flags,,,

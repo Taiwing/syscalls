@@ -58,7 +58,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 86,uselib,ok,long,1,const char * library,,,,,
 87,swapon,ok,long,2,const char * specialfile,int swap_flags,,,,
 88,reboot,ok,long,4,int magic1,int magic2,unsigned int cmd,void * arg,,
-89,readdir,anon,long,3,unsigned int fd,struct compat_old_linux_dirent *,unsigned int count,,,
+89,readdir,ok,long,3,unsigned int fd,struct old_linux_dirent * dirent,unsigned int count,,,
 90,mmap,ok,long,1,struct mmap_arg_struct * arg,,,,,
 91,munmap,ok,long,2,unsigned long addr,size_t len,,,,
 92,truncate,ok,long,2,const char * path,long length,,,,

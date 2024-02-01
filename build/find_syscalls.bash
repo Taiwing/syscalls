@@ -671,8 +671,8 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 	SYS_NUMBER=${SCOLS[0]}
 	SYS_NAME=${SCOLS[1]}
 	SYS_ENTRY=${SCOLS[2]}
-	#remove sys_ prefix from SYS_ENTRY if any
 	SYS_ENTRY_NAME=${SYS_ENTRY#sys_}
+	COMPAT_ENTRY_NAME=${SYS_ENTRY#compat_sys_}
 
 	# find the syscall file
 	FILE=""
@@ -687,6 +687,13 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		if [ $RESULT -ne 1 -a $SYS_NAME != $SYS_ENTRY_NAME ]; then
 			METHOD="define-entry"
 			FILES=($(find_by_define $SYS_NUMBER $SYS_ENTRY_NAME $SYS_ENTRY))
+			RESULT=$?
+		fi
+
+		# try to find the syscall define by compat entry point name
+		if [ $RESULT -ne 1 -a $SYS_NAME != $COMPAT_ENTRY_NAME ]; then
+			METHOD="define-compat"
+			FILES=($(find_by_define $SYS_NUMBER $COMPAT_ENTRY_NAME $SYS_ENTRY))
 			RESULT=$?
 		fi
 
@@ -737,6 +744,9 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		elif [ $METHOD = "define-entry" ]; then
 			DETAILS=$(get_details_by_define $SYS_ENTRY_NAME $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_define "$SYS_ENTRY_NAME" "$DETAILS")
+		elif [ $METHOD = "define-compat" ]; then
+			DETAILS=$(get_details_by_define $COMPAT_ENTRY_NAME $FILE)
+			PARSED_PROTOTYPE=$(parse_syscall_define "$COMPAT_ENTRY_NAME" "$DETAILS")
 		elif [ $METHOD = "asm" ]; then
 			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
 		fi

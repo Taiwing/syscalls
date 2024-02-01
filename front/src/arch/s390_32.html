@@ -989,11 +989,11 @@
 					<tr>
 						<td>89</td>
 						<td>readdir</td>
-						<td>anon</td>
+						<td>ok</td>
 						<td>long</td>
 						<td>3</td>
 						<td>unsigned int fd</td>
-						<td>struct compat_old_linux_dirent *</td>
+						<td>struct old_linux_dirent * dirent</td>
 						<td>unsigned int count</td>
 						<td>-</td>
 						<td>-</td>
@@ -1539,10 +1539,10 @@
 						<td>long</td>
 						<td>5</td>
 						<td>int n</td>
-						<td>compat_ulong_t * inp</td>
-						<td>compat_ulong_t * outp</td>
-						<td>compat_ulong_t * exp</td>
-						<td>struct old_timeval32 * tvp</td>
+						<td>fd_set * inp</td>
+						<td>fd_set * outp</td>
+						<td>fd_set * exp</td>
+						<td>struct __kernel_old_timeval * tvp</td>
 						<td>-</td>
 					</tr>
 					<tr>
@@ -2098,7 +2098,7 @@
 						<td>long</td>
 						<td>2</td>
 						<td>unsigned int resource</td>
-						<td>struct compat_rlimit * rlim</td>
+						<td>struct rlimit * rlim</td>
 						<td>-</td>
 						<td>-</td>
 						<td>-</td>
