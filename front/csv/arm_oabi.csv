@@ -91,7 +91,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 107,lstat,ok,long,2,const char * filename,struct __old_kernel_stat * statbuf,,,,
 108,fstat,ok,long,2,unsigned int fd,struct __old_kernel_stat * statbuf,,,,
 111,vhangup,ok,long,0,,,,,,
-113,syscall,ok,long,0,,,,,,
+113,syscall,noparam,long,0,,,,,,
 114,wait4,ok,long,4,pid_t upid,int * stat_addr,int options,struct rusage * ru,,
 115,swapoff,ok,long,1,const char * specialfile,,,,,
 116,sysinfo,ok,long,1,struct sysinfo * info,,,,,

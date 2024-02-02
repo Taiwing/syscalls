@@ -22,6 +22,17 @@ ARCH_DIR="arch"
 # Functions
 ################################################################################
 
+count_status() {
+    local STATUS="$1"
+
+    COUNT=$(\
+		rg -c ",$STATUS," "$ROOT"/front/csv \
+		| awk -F ':' '{s+=$2} END {print s}' \
+	)
+	[ -z "$COUNT" ] && COUNT=0
+    echo "$COUNT"
+}
+
 # print the list of syscall pages
 print_main() {
     cat <<EOF
@@ -109,35 +120,46 @@ EOF
 			<h2>Syscall status</h2>
 			<p>
 				The syscall lists are always complete, meaning that there won't
-				be any missing syscall. However, some syscalls might not have
-				any parameter listed. Most of the time, this is because the
-				syscall is not implemented. The status will be 'notimp' in the
-				csv files. In some rare cases, this can be because the script
-				was not able to find or parse the syscall declaration. The
-				status will be set to 'missing' in the csv files. Right now,
-				this is only the case for some syscalls directly implemented in
-				assembly. This is not yet totally supported by the parsing
-				script but it might be in the future.
+				be any missing syscall even when they are not found. However the
+				prototype can be missing or incomplete.
 			</p>
 			<p>
-				Other syscalls might be lacking some information about their
-				parameters. This is because the syscall declaration was not
-				explicit enough. For example, the <code>oldolduname</code>
-				syscall entry point for the i386 architecture is declared as
-				follows: <code>int sys_olduname(struct oldold_utsname *);</code>
-				As you can see, the parameter is not named. This is not a
-				problem for the kernel, but it is for the parsing script. In
-				this case, the status will be set to 'anon' and only the type of
-				the parameter will be listed.
+				Therefore each syscall has a status. You can find it in the csv
+				files. On the website non-implemented syscalls are not shown and
+				missing prototype information is symbolized by a <code>?</code>.
+				The status can be one of the following:
 			</p>
+			<ul>
+				<li>
+					<code>ok</code>: The syscall was successfully found and
+					parsed. All its parameters are listed and named.
+					(total: $(count_status ok))
+				</li>
+				<li>
+					<code>anon</code>: The syscall was successfully found and
+					parsed but some of its parameters are not named.
+					(total: $(count_status anon))
+				</li>
+				<li>
+					<code>noparam</code>: The syscall was successfully found but
+					its parameters are not listed.
+					(total: $(count_status noparam))
+				</li>
+				<li>
+					<code>notimp</code>: The syscall is not implemented.
+					(total: $(count_status notimp))
+				</li>
+				<li>
+					<code>missing</code>: The syscall was not found in the
+					source code. This is a failure of the parsing script.
+					(total: $(count_status missing))
+				</li>
+			</ul>
+			<h2>Contributing</h2>
 			<p>
-				Most of the syscalls will show up as 'ok' in the csv files. This
-				means that the data was successfully extracted from the kernel
-				source code. It should be accurate, complete and up-to-date.
-				However, if you find any error, please feel free to report it on
-				the
+				If you find any error, please feel free to report it on the
 				<a href="https://github.com/Taiwing/syscalls">github</a>
-				repository.
+				repository. Pull requests are also welcome.
 			</p>
 		</main>
 EOF

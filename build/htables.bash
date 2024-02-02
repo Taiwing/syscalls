@@ -80,7 +80,7 @@ while read LINE; do
 	RETURN_TYPE="${ARRAY[3]}"
 	PARAMS_COUNT="${ARRAY[4]}"
 	DEFAULT_PARAM="-"
-	[ $STATUS = 'missing' ] && DEFAULT_PARAM="?"
+	[ $STATUS = 'missing' -o $STATUS = 'noparam' ] && DEFAULT_PARAM="?"
 	PARAM1="${ARRAY[5]:-$DEFAULT_PARAM}"
 	PARAM2="${ARRAY[6]:-$DEFAULT_PARAM}"
 	PARAM3="${ARRAY[7]:-$DEFAULT_PARAM}"

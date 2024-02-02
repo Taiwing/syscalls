@@ -10,7 +10,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 8,creat,ok,long,2,const char * pathname,umode_t mode,,,,
 9,link,ok,long,2,const char * oldname,const char * newname,,,,
 10,unlink,ok,long,1,const char * pathname,,,,,
-11,execv,ok,long,0,,,,,,
+11,execv,noparam,long,0,,,,,,
 12,chdir,ok,long,1,const char * filename,,,,,
 13,chown,ok,long,3,const char * filename,uid_t user,gid_t group,,,
 14,mknod,ok,long,3,const char * filename,umode_t mode,unsigned dev,,,

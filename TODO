@@ -1,16 +1,6 @@
 --- TODO ---
 
-home page:
-	- Rework the status description to make it clearer. Simply list the
-	  different possible status and add examples or list the cases if they are
-	  few.
-	- remove references to missing asm syscalls since we have the all now
-
-find_syscalls:
-	- add a new status for syscalls like "syscall" and sparc32's "execv" since
-	  they are implemented and found but their parameters are missing (not "asm"
-	  since "sigreturn" are found by asm but dont actually have parameter so its
-	  not a problem) (incomplete ?)
+- fix last missing syscall
 
 --- MAYBE ---
 
@@ -18,7 +8,9 @@ front:
 	- add a "diff" section to show the changes from last week (maybe literally
 	  use the diff command for this)
 
-find_syscalls: (actually hard to do...)
-	- check every architecture name and add as many special cases as necessary
-	- check the new architectures with other lists: arc, arm64, csky, hexagon,
-	  loongarch_32, loongarch_64, nios2, openrisc, riscv_32, riscv_64
+- fix noparam syscalls (how though ? hardcoding ?)
+- check every architecture name and add as many special cases as necessary
+- check the new architectures with other lists: arc, arm64, csky, hexagon,
+  loongarch_32, loongarch_64, nios2, openrisc, riscv_32, riscv_64
+- add the source file to the csv files so the user can see check himself that
+  the data is correct

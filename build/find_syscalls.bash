@@ -679,6 +679,7 @@ UNIQUE_COUNT=0
 NOT_IMPLEMENTED_COUNT=0
 NOT_FOUND_COUNT=0
 ANONYMOUS_PARAMETERS_COUNT=0
+NOPARAM_COUNT=0
 for SYSCALL in "${SYS_CALLS[@]}"; do
 	# split syscall line into columns
 	SCOLS=(${SYSCALL})
@@ -763,6 +764,8 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			PARSED_PROTOTYPE=$(parse_syscall_define "$COMPAT_ENTRY_NAME" "$DETAILS")
 		elif [ $METHOD = "asm" ]; then
 			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
+			# set PARSED to 3 if the syscall is not sigreturn for noparam status
+			([[ $SYS_NAME =~ sigreturn ]] && exit 0 || exit 3)
 		fi
 		PARSED=$?
 
@@ -787,10 +790,15 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		if [ $PARSED -eq 2 ]; then
 			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() has anonymous parameters"
 			ANONYMOUS_PARAMETERS_COUNT=$((ANONYMOUS_PARAMETERS_COUNT+1))
+		elif [ $PARSED -eq 3 ]; then
+			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() parameters were not found"
+			NOPARAM_COUNT=$((NOPARAM_COUNT+1))
 		fi
 		echo -n "$SYS_NUMBER,$SYS_NAME," >> $OUTPUT_FILE
 		if [ $PARSED -eq 2 ]; then
 			echo -n "anon," >> $OUTPUT_FILE
+		elif [ $PARSED -eq 3 ]; then
+			echo -n "noparam," >> $OUTPUT_FILE
 		else
 			echo -n "ok," >> $OUTPUT_FILE
 		fi
@@ -808,10 +816,16 @@ done
 
 echo
 echo -n "Unique definition: $UNIQUE_COUNT/${#SYS_CALLS[@]}"
-if [ $ANONYMOUS_PARAMETERS_COUNT -gt 0 ]; then
-	echo " ($ANONYMOUS_PARAMETERS_COUNT with anonymous parameters)"
+
+if [ $ANONYMOUS_PARAMETERS_COUNT -gt 0 -a $NOPARAM_COUNT -gt 0 ]; then
+	echo " (anon: $ANONYMOUS_PARAMETERS_COUNT, noparam: $NOPARAM_COUNT)"
+elif [ $ANONYMOUS_PARAMETERS_COUNT -gt 0 ]; then
+	echo " (anon: $ANONYMOUS_PARAMETERS_COUNT)"
+elif [ $NOPARAM_COUNT -gt 0 ]; then
+	echo " (noparam: $NOPARAM_COUNT)"
 else
 	echo
 fi
+
 echo "Not implemented: $NOT_IMPLEMENTED_COUNT/${#SYS_CALLS[@]}"
 echo "Not found: $NOT_FOUND_COUNT/${#SYS_CALLS[@]}"
