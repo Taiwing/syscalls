@@ -9,8 +9,5 @@ front:
 	  use the diff command for this)
 
 - fix noparam syscalls (how though ? hardcoding ?)
-- check every architecture name and add as many special cases as necessary
-- check the new architectures with other lists: arc, arm64, csky, hexagon,
-  loongarch_32, loongarch_64, nios2, openrisc, riscv_32, riscv_64
-- add the source file to the csv files so the user can see check himself that
-  the data is correct
+- add the source file to the csv files so the user can check himself that the
+  data is correct
