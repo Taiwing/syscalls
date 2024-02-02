@@ -1,7 +1,16 @@
 --- TODO ---
 
+home page:
+	- Rework the status description to make it clearer. Simply list the
+	  different possible status and add examples or list the cases if they are
+	  few.
+	- remove references to missing asm syscalls since we have the all now
+
 find_syscalls:
-	- handle syscalls implemented directly in assembly
+	- add a new status for syscalls like "syscall" and sparc32's "execv" since
+	  they are implemented and found but their parameters are missing (not "asm"
+	  since "sigreturn" are found by asm but dont actually have parameter so its
+	  not a problem) (incomplete ?)
 
 --- MAYBE ---
 
