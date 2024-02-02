@@ -1,5 +1,5 @@
 nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
-0,syscall,missing,,,,,,,,
+0,syscall,ok,long,0,,,,,,
 1,exit,ok,long,1,int error_code,,,,,
 2,fork,ok,long,0,,,,,,
 3,read,ok,long,3,unsigned int fd,char * buf,size_t count,,,

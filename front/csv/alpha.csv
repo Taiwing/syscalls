@@ -1,5 +1,5 @@
 nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
-0,osf_syscall,missing,,,,,,,,
+0,osf_syscall,ok,long,0,,,,,,
 1,exit,ok,long,1,int error_code,,,,,
 2,fork,ok,long,0,,,,,,
 3,read,ok,long,3,unsigned int fd,char * buf,size_t count,,,
@@ -101,7 +101,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 100,getpriority,ok,long,2,int which,int who,,,,
 101,send,ok,long,4,int fd,void * buff,size_t len,unsigned int flags,,
 102,recv,ok,long,4,int fd,void * ubuf,size_t size,unsigned int flags,,
-103,sigreturn,missing,,,,,,,,
+103,sigreturn,ok,long,0,,,,,,
 104,bind,ok,long,3,int fd,struct sockaddr * umyaddr,int addrlen,,,
 105,setsockopt,ok,long,5,int fd,int level,int optname,char * optval,int optlen,
 106,listen,ok,long,2,int fd,int backlog,,,,

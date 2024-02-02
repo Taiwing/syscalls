@@ -1,20 +1,3 @@
-arch: arm
-abi: oabi
-sys_syscall -> arch/arm/kernel/entry-common.S
-
-arch: mips
-abi: o32
-sys_syscall -> arch/mips/kernel/scall32-o32.S
-
-arch: sparc
-abi: 32
-sunos_execv -> arch/sparc/kernel/syscalls.S && arch/sparc/kernel/entry.S
-
 arch: x86
 abi: i386
 sys_sigreturn -> arch/x86/um/signal.c
-
-arch: alpha
-abi: common
-alpha_syscall_zero -> arch/alpha/kernel/entry.S
-sys_sigreturn -> ???
