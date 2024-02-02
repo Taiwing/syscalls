@@ -632,13 +632,20 @@ VALID_ASM_PATHS=()
 [ "$ARCH_NAME" != "generic" ] && VALID_ASM_PATHS+=("arch/$ARCH_NAME")
 
 # which syscalls should be looked for in the asm files (special cases)
-VALID_ASM_SYSCALLS=("sigreturn" "rt_sigreturn")
+VALID_ASM_SYSCALLS=(
+	"sigreturn"
+	"rt_sigreturn"
+	"syscall"
+	"osf_syscall"
+	"sunos_execv"
+)
 
 # This only works for some syscalls which have an asm entry point and for which
 # the prototype is already known (it is actually hard-coded as there's only one
 # possible prototype for each of these syscalls right now). This is really just
 # to check that the entry point actually exists.
 function find_by_asm {
+	local SYS_NAME=$2
 	local SYS_ENTRY=$3
 	local FILES=()
 	local RESULT=0
@@ -647,6 +654,13 @@ function find_by_asm {
 	OUTPUT=()
 	for ASM_PATH in ${VALID_ASM_PATHS[@]}; do
 		OUTPUT=($(rg --glob '*.S' --count-matches "\b$SYS_ENTRY\b" $ASM_PATH))
+
+		# on failure, try with the name of the syscall (should only work for
+		# alpha's sigreturn special case)
+		if [ ${#OUTPUT[@]} -eq 0 ]; then
+			OUTPUT=($(rg --glob '*.S' --count-matches "\b$SYS_NAME\b" $ASM_PATH))
+		fi
+
 		if [ ${#OUTPUT[@]} -gt 0 ]; then
 			FILES+=($(echo ${OUTPUT[0]} | cut -d ':' -f 1))
 			RESULT=1
