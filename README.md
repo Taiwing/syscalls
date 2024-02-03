@@ -84,3 +84,16 @@ add the following lines to your crontab:
 SHELL=path/of/your/bash/executable
 BASH\_ENV=path/of/your/bash/config
 ```
+
+## Other Sources
+
+There are some other projects listing the linux kernel syscalls that have been a
+great help during the development of this application. Some have more or less
+informations about each syscall. They also do not handle the exact same set of
+architectures. They might be used to cross-reference the lists provided here or
+simply as an additional source regarding linux syscalls:
+
+- https://gpages.juszkiewicz.com.pl/syscalls-table/syscalls.html
+- https://syscalls.w3challs.com/
+- https://syscall.sh/about
+- https://github.com/strace/strace/tree/master/src/linux
