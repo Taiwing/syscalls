@@ -9,5 +9,6 @@ front:
 	  use the diff command for this)
 
 - fix noparam syscalls (how though ? hardcoding ?)
+- fix noparam fanotify_mark (handle CONFIG_ARCH_SPLIT_ARG64... not easy)
 - add the source file to the csv files so the user can check himself that the
   data is correct

@@ -142,7 +142,8 @@ EOF
 				</li>
 				<li>
 					<code>noparam</code>: The syscall was successfully found but
-					its parameters are not listed.
+					its parameters are not listed because the script couldn't
+					parse them.
 					(total: $(count_status noparam))
 				</li>
 				<li>

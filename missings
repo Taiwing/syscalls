@@ -1,3 +1,0 @@
-arch: x86
-abi: i386
-sys_sigreturn -> arch/x86/um/signal.c

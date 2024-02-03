@@ -244,7 +244,7 @@ function parse_syscall_define {
 
 	# get parameter count and parameter string
 	local PARAMETER_COUNT=0
-	[[ "$PROTOTYPE" =~ ^SYSCALL_DEFINE([0-9]+)\((.*)\)$ ]] || return 1
+	[[ "$PROTOTYPE" =~ ^SYSCALL[0-9]*_DEFINE([0-9]+)\((.*)\)$ ]] || return 1
 	PARAMETER_COUNT="${BASH_REMATCH[1]}"
 	PROTOTYPE="${BASH_REMATCH[2]}"
 
@@ -509,6 +509,8 @@ function find_matching_file_by_define {
 	[ -z "$2" ] && DEFINE_PATHS=(${VALID_DEFINE_PATHS[@]}) || DEFINE_PATHS=($2)
 
 	local REGEX="\bSYSCALL_DEFINE.\($SYS_NAME\b"
+	[ $ADDR_SIZE -eq 32 ] && REGEX="\bSYSCALL(32)?_DEFINE.\($SYS_NAME\b"
+
 	for DEFINE_PATH in ${DEFINE_PATHS[@]}; do
 		# find by syscall define
 		OUTPUT=()
@@ -559,8 +561,11 @@ function get_details_by_define {
 	local SYS_NAME=$1
 	local FILE=$2
 
+	local REGEX="\bSYSCALL_DEFINE.\($SYS_NAME\b(?s).*?\)"
+	[ $ADDR_SIZE -eq 32 ] && REGEX="\bSYSCALL(32)?_DEFINE.\($SYS_NAME\b(?s).*?\)"
+
 	# get the full define
-	rg -U "\bSYSCALL_DEFINE.\($SYS_NAME\b(?s).*?\)" $FILE
+	rg -U $REGEX $FILE
 }
 
 function find_by_prototype {
@@ -763,17 +768,14 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 			DETAILS=$(get_details_by_define $COMPAT_ENTRY_NAME $FILE)
 			PARSED_PROTOTYPE=$(parse_syscall_define "$COMPAT_ENTRY_NAME" "$DETAILS")
 		elif [ $METHOD = "asm" ]; then
-			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
-			# set PARSED to 3 if the syscall is not sigreturn for noparam status
-			([[ $SYS_NAME =~ sigreturn ]] && exit 0 || exit 3)
+			# special case for sigreturn (set to ok since it has 0 param)
+			([[ $SYS_NAME =~ sigreturn ]] && exit 0 || exit 1)
 		fi
 		PARSED=$?
 
 		# check if we actually got the prototype
 		if [ $PARSED -eq 1 -o -z "$PARSED_PROTOTYPE" ]; then
-			echo "ERROR: $SYS_NUMBER $SYS_NAME: failed to parse prototype"
-			echo $DETAILS
-			exit 1
+			PARSED_PROTOTYPE=$(echo -n "long,0,,,,,,")
 		fi
 	fi
 
@@ -787,20 +789,17 @@ for SYSCALL in "${SYS_CALLS[@]}"; do
 		echo "$SYS_NUMBER,$SYS_NAME,missing,,,,,,,," >> $OUTPUT_FILE
 	elif [ $RESULT -eq 1 ]; then
 		UNIQUE_COUNT=$((UNIQUE_COUNT+1))
-		if [ $PARSED -eq 2 ]; then
+		echo -n "$SYS_NUMBER,$SYS_NAME," >> $OUTPUT_FILE
+		if [ $PARSED -eq 0 ]; then
+			echo -n "ok," >> $OUTPUT_FILE
+		elif [ $PARSED -eq 1 ]; then
+			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() parameters are missing"
+			NOPARAM_COUNT=$((NOPARAM_COUNT+1))
+			echo -n "noparam," >> $OUTPUT_FILE
+		elif [ $PARSED -eq 2 ]; then
 			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() has anonymous parameters"
 			ANONYMOUS_PARAMETERS_COUNT=$((ANONYMOUS_PARAMETERS_COUNT+1))
-		elif [ $PARSED -eq 3 ]; then
-			echo "$SYS_NUMBER $SYS_NAME $SYS_ENTRY() parameters were not found"
-			NOPARAM_COUNT=$((NOPARAM_COUNT+1))
-		fi
-		echo -n "$SYS_NUMBER,$SYS_NAME," >> $OUTPUT_FILE
-		if [ $PARSED -eq 2 ]; then
 			echo -n "anon," >> $OUTPUT_FILE
-		elif [ $PARSED -eq 3 ]; then
-			echo -n "noparam," >> $OUTPUT_FILE
-		else
-			echo -n "ok," >> $OUTPUT_FILE
 		fi
 		echo "$PARSED_PROTOTYPE" >> $OUTPUT_FILE
 	else

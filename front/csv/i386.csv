@@ -118,7 +118,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 116,sysinfo,ok,long,1,struct sysinfo * info,,,,,
 117,ipc,ok,long,6,unsigned int call,int first,unsigned long second,unsigned long third,void * ptr,long fifth
 118,fsync,ok,long,1,unsigned int fd,,,,,
-119,sigreturn,missing,,,,,,,,
+119,sigreturn,ok,long,0,,,,,,
 120,clone,ok,long,5,unsigned long clone_flags,unsigned long newsp,int * parent_tidptr,unsigned long tls,int * child_tidptr,
 121,setdomainname,ok,long,2,char * name,int len,,,,
 122,uname,ok,long,1,struct old_utsname * name,,,,,
@@ -334,7 +334,7 @@ nr,name,status,return_type,param_count,param1,param2,param3,param4,param5,param6
 336,perf_event_open,ok,long,5,struct perf_event_attr * attr_uptr,pid_t pid,int cpu,int group_fd,unsigned long flags,
 337,recvmmsg,ok,long,5,int fd,struct mmsghdr * mmsg,unsigned int vlen,unsigned int flags,struct __kernel_timespec * timeout,
 338,fanotify_init,ok,long,2,unsigned int flags,unsigned int event_f_flags,,,,
-339,fanotify_mark,ok,long,5,int fanotify_fd,unsigned int flags,__u64 mask,int dfd,const char * pathname,
+339,fanotify_mark,noparam,long,0,,,,,,
 340,prlimit64,ok,long,4,pid_t pid,unsigned int resource,const struct rlimit64 * new_rlim,struct rlimit64 * old_rlim,,
 341,name_to_handle_at,ok,long,5,int dfd,const char * name,struct file_handle * handle,int * mnt_id,int flag,
 342,open_by_handle_at,ok,long,3,int mountdirfd,struct file_handle * handle,int flags,,,
