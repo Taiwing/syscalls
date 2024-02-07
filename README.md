@@ -4,6 +4,11 @@ A small web application that lists the linux kernel syscalls for each available
 architecture. It does this with a script that parses the kernel's source code.
 Then static html pages are generated from the collected data.
 
+<br />
+<p align="center">
+	<img src="https://github.com/Taiwing/syscalls/blob/master/resources/screenshot.png?raw=true" alt="Syscalls app screenshot" style="width: 50%;" />
+</p>
+
 ## Description
 
 The main goal of this project is to automate the process so that this resource
