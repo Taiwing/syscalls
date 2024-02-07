@@ -82,7 +82,7 @@ add the following lines to your crontab:
 
 ```shell
 SHELL=path/of/your/bash/executable
-BASH\_ENV=path/of/your/bash/config
+BASH_ENV=path/of/your/bash/config
 ```
 
 ## Other Sources
