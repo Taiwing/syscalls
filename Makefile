@@ -8,7 +8,7 @@ ARCH_DIR := ${SRC_DIR}/arch
 
 all: ${SRC_DIR}/index.html
 
-${SRC_DIR}/index.html: ${ARCH_DIR} ${CSV_DIR}/syscalls.tar.gz ${BUILD_DIR}/last_update
+${SRC_DIR}/index.html: ${CSV_DIR}/syscalls.tar.gz ${ARCH_DIR} ${BUILD_DIR}/last_update
 	${BUILD_DIR}/index.bash
 
 ${ARCH_DIR}: ${CSV_DIR} ${BUILD_DIR}/last_update
