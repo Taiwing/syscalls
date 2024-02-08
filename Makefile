@@ -8,10 +8,10 @@ ARCH_DIR := ${SRC_DIR}/arch
 
 all: ${SRC_DIR}/index.html
 
-${SRC_DIR}/index.html: ${CSV_DIR} ${ARCH_DIR} ${BUILD_DIR}/last_update
+${SRC_DIR}/index.html: ${ARCH_DIR}
 	${BUILD_DIR}/index.bash
 
-${ARCH_DIR}: ${CSV_DIR} ${BUILD_DIR}/last_update
+${ARCH_DIR}: ${BUILD_DIR}/last_update ${CSV_DIR}
 	mkdir -p $@
 	${BUILD_DIR}/foreach_csv.bash
 
@@ -26,8 +26,12 @@ ${TBL_DIR}:
 	${BUILD_DIR}/generate_table.bash generic 32 32
 	${BUILD_DIR}/generate_table.bash generic 64 64
 
-${BUILD_DIR}/last_update:
+${BUILD_DIR}/last_update: ${LINUX_DIR}
+	cd ${LINUX_DIR} && git pull
 	date -R > $@
+
+${LINUX_DIR}:
+	git clone https://github.com/torvalds/linux.git $@
 
 front_clean:
 	rm -f ${SRC_DIR}/index.html

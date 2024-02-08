@@ -38,8 +38,9 @@ programs available:
 ### Run the application
 
 ```shell
-# clone it (downloading the kernel will take some time)
-git clone --recurse-submodules https://github.com/Taiwing/syscalls
+# clone it
+git clone https://github.com/Taiwing/syscalls
+cd syscalls/
 ```
 
 The first thing you need to do is to create an environment file for the
@@ -62,11 +63,14 @@ docker compose up --build
 
 Click [here](http://localhost:8080) to test it locally.
 
+> The first `make` command will take some time because it needs to clone the
+> kernel repository (which is pretty big to download).
+
 ### Automation
 
-To keep the lists up to date automatically simply create a cron job running the
-_update.bash_ script. It will pull the last changes from the linux kernel
-repository, re-build the application and restart it.
+To keep the lists up to date automatically simply create a cron job running
+`make re`. It will pull the last changes from the linux kernel repository and
+rebuild the application source files. Then restart the docker compose instance.
 
 ```shell
 # edit the cron job table
@@ -76,7 +80,7 @@ crontab -e
 Add this line to your crontab to run it once a week:
 
 ```cron
-0 7 * * 1 path/of/this/repo/update.bash
+0 7 * * 1 make -C path/of/this/repo/ re && docker compose up -d --build
 ```
 
 If you have issues when running the script with cron (like empty lists), this is
