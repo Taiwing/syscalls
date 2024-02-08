@@ -26,12 +26,10 @@ ${TBL_DIR}:
 	${BUILD_DIR}/generate_table.bash generic 32 32
 	${BUILD_DIR}/generate_table.bash generic 64 64
 
-${BUILD_DIR}/last_update: ${LINUX_DIR}
-	cd ${LINUX_DIR} && git pull
+${BUILD_DIR}/last_update:
+	git -C ${LINUX_DIR} pull \
+		|| git clone https://github.com/torvalds/linux.git ${LINUX_DIR}
 	date -R > $@
-
-${LINUX_DIR}:
-	git clone https://github.com/torvalds/linux.git $@
 
 front_clean:
 	rm -f ${SRC_DIR}/index.html
