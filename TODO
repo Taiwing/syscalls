@@ -3,6 +3,10 @@
 - add a "diff" section to show the changes from last week (maybe literally use
   the diff command for this)
 - use this to create an history of changes (that might be useful for debugging)
+- Actually maybe use git for this haha (create a csv repo that would be used just
+  for this). It would be ignored by the syscalls repo but would provide a useful
+  history none the less. Create the "csv" repo when creating the directory. Commit
+  if there is any change.
 
 - fix noparam syscalls (how though ? hardcoding ?)
 - fix noparam fanotify_mark (handle CONFIG_ARCH_SPLIT_ARG64... not easy)
