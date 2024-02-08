@@ -18,8 +18,5 @@ date -R > build/last_update
 make -C build/ re
 make -C build/ clean
 
-# commit the new application build
-git commit -am "build: update syscalls list"
-
 # rebuild the running application
 docker compose up -d --build --force-recreate
