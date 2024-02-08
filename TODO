@@ -1,8 +1,8 @@
 --- MAYBE ---
 
-front:
-	- add a "diff" section to show the changes from last week (maybe literally
-	  use the diff command for this)
+- add a "diff" section to show the changes from last week (maybe literally use
+  the diff command for this)
+- use this to create an history of changes (that might be useful for debugging)
 
 - fix noparam syscalls (how though ? hardcoding ?)
 - fix noparam fanotify_mark (handle CONFIG_ARCH_SPLIT_ARG64... not easy)
