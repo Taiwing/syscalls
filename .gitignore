@@ -1,5 +1,8 @@
 *.swp
 .env
+*.log
+*.log.old
+*.log.new
 linux/
 build/last_update
 front/csv/
