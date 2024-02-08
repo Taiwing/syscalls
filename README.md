@@ -80,7 +80,7 @@ crontab -e
 Add this line to your crontab to run it once a week:
 
 ```cron
-0 7 * * 1 make -C path/of/this/repo/ re && docker compose up -d --build
+0 7 * * 1 cd path/of/this/repo/ && make re && docker compose up -d --build
 ```
 
 If you have issues when running the script with cron (like empty lists), this is
