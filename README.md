@@ -68,9 +68,9 @@ Click [here](http://localhost:8080) to test it locally.
 
 ### Automation
 
-To keep the lists up to date automatically simply create a cron job running
-`make re`. It will pull the last changes from the linux kernel repository and
-rebuild the application source files. Then restart the docker compose instance.
+To keep the lists up to date automatically simply create a cron job running the
+update script. It will pull the last changes from the linux kernel repository,
+rebuild the application source files and restart the container.
 
 ```shell
 # edit the cron job table
@@ -80,7 +80,7 @@ crontab -e
 Add this line to your crontab to run it once a week:
 
 ```cron
-0 7 * * 1 cd path/of/this/repo/ && make re && docker compose up -d --build
+0 7 * * 1 path/of/this/repo/update.bash
 ```
 
 If you have issues when running the script with cron (like empty lists), this is
