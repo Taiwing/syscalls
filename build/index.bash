@@ -11,6 +11,9 @@
 # Set the path to the root of the git repository
 ROOT="$(git rev-parse --show-toplevel)"
 
+# build directory
+BUILD_DIR="${ROOT}/build"
+
 # output file
 OUTPUT_DIR="${ROOT}/front/src"
 OUTPUT_FILE="${OUTPUT_DIR}/index.html"
@@ -171,7 +174,7 @@ EOF
 ################################################################################
 
 # include the template functions
-source ./template.bash
+source ${BUILD_DIR}/template.bash
 
 main() {
     print_head "Home" "style" "home" > "${OUTPUT_FILE}"

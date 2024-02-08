@@ -33,7 +33,6 @@ ARCH_ONLY="${4}"
 ARCH_ABI="${ARCH_NAME}_${ABI_NAME}"
 # path to the output directory
 OUTPUT_DIR="tbl"
-mkdir -p $OUTPUT_DIR
 # path to the output file
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_NAME}_${ABI_NAME}.tbl"
 # if ARCH_ONLY (when theres only one ABI)

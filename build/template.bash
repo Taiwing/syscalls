@@ -50,7 +50,7 @@ EOF
 				<a id="app-name" href="/">${WEBSITE_NAME}</a>
 				- ${PAGE_TITLE}
 			</p>
-			<p class="desktop">Last update: $(cat last_update)</p>
+			<p class="desktop">Last update: $(cat ${BUILD_DIR}/last_update)</p>
 		</header>
 EOF
 }

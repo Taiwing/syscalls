@@ -14,9 +14,7 @@ git pull --recurse-submodules
 git submodule update --remote --recursive
 
 # rebuild the front files
-date -R > build/last_update
-make -C build/ re
-make -C build/ clean
+make re
 
 # rebuild the running application
 docker compose up -d --build --force-recreate

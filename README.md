@@ -54,7 +54,7 @@ Then you can build the application and run it:
 
 ```shell
 # build the front
-make -C build/
+make
 
 # run the app
 docker compose up --build

@@ -12,6 +12,9 @@
 # set the path to the root of the git repository
 ROOT="$(git rev-parse --show-toplevel)"
 
+# build directory
+BUILD_DIR="${ROOT}/build"
+
 # path to the linux kernel source code
 LINUX_PATH="${ROOT}/linux"
 cd $LINUX_PATH
@@ -77,10 +80,10 @@ main() {
 	for ARCH in "${!ABIS[@]}"; do
 		# if there is only one ABI
 		if [ $(echo ${ABIS[$ARCH]} | wc -w) -lt 2 ]; then
-			./build/generate_table.bash $ARCH common ${ABIS[$ARCH]} yes
+			${BUILD_DIR}/generate_table.bash $ARCH common ${ABIS[$ARCH]} yes
 		else
 			for ABI in ${ABIS[$ARCH]}; do
-				./build/generate_table.bash $ARCH $ABI $ABI ""
+				${BUILD_DIR}/generate_table.bash $ARCH $ABI $ABI ""
 			done
 		fi
 	done

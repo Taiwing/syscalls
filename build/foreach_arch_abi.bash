@@ -13,6 +13,9 @@ ARCH_NAME_ARG="$1"
 ABI_NAME_ARG="$2"
 ABI_NAME_ARG_OLD=""
 
+# build directory
+BUILD_DIR="${ROOT}/build"
+
 # path to the linux kernel source code
 LINUX_PATH="${ROOT}/linux"
 
@@ -96,7 +99,7 @@ for TABLE_FILE in ${TABLE_FILES}; do
 		echo
 
 		# get the syscalls
-		./find_syscalls.bash "$ARCH_FILE" "$ARCH_NAME" "$ABI_NAME"
+		${BUILD_DIR}/find_syscalls.bash "$ARCH_FILE" "$ARCH_NAME" "$ABI_NAME"
 	done
 
 	# restore ABI_NAME_ARG if it was changed

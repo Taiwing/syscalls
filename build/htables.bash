@@ -18,6 +18,9 @@
 # Set the path to the root of the git repository
 ROOT="$(git rev-parse --show-toplevel)"
 
+# build directory
+BUILD_DIR="${ROOT}/build"
+
 # the csv file
 CSV_FILE="$1"
 # the architecture
@@ -28,7 +31,7 @@ OUTPUT_DIR="${ROOT}/front/src/arch"
 OUTPUT_FILE="${OUTPUT_DIR}/${ARCH_ABI}.html"
 
 # include the template functions
-source ./template.bash
+source ${BUILD_DIR}/template.bash
 
 ################################################################################
 # Create the output files
